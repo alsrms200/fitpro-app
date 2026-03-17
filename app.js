@@ -69,6 +69,26 @@ function todayDate() {
   return now.getDate();
 }
 
+function animateCounter(id, start, end, suffix, duration = 1000, decimals = 0) {
+  const el = $(id);
+  if (!el) return;
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+    const value = easeOutQuart * (end - start) + start;
+    el.textContent = value.toFixed(decimals) + suffix;
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      el.textContent = end.toFixed(decimals) + suffix;
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+
 // ── Navigation ────────────────────────────────────────────────────
 function initNav() {
   document.querySelectorAll('.nav-item').forEach(item => {
