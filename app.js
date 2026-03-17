@@ -48,15 +48,28 @@ const DEFAULT_EXERCISE_LOG = [
   { id:3, date:'2026-03-10', type:'등산', title:'관악산 등반 (초보 코스)', duration:180, cal:1200 },
 ];
 
-// 로컬 스토리지 대신 서버 DB에서 운동 기록 불러오기 위한 상태
+// 인증 및 API 상태
 let EXERCISE_LOG = [];
 const API_BASE = 'http://localhost:5000/api';
+let AUTH_TOKEN = localStorage.getItem('fitpro_token');
+let AUTH_USER = localStorage.getItem('fitpro_user');
+
+function getAuthHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': AUTH_TOKEN ? `Bearer ${AUTH_TOKEN}` : ''
+  };
+}
 
 async function loadExercises() {
+  if (!AUTH_TOKEN) return; // 미로그인 시 중단
   try {
-    const res = await fetch(`${API_BASE}/exercises`);
+    const res = await fetch(`${API_BASE}/exercises`, { headers: getAuthHeaders() });
     if (res.ok) {
       EXERCISE_LOG = await res.json();
+    } else if (res.status === 401 || res.status === 403) {
+      handleLogout(); // 만료시 자동 로그아웃
+      return;
     } else {
       console.warn('DB에서 데이터를 가져오지 못해 기본값을 사용합니다.');
       EXERCISE_LOG = [...DEFAULT_EXERCISE_LOG];
@@ -66,8 +79,17 @@ async function loadExercises() {
     EXERCISE_LOG = [...DEFAULT_EXERCISE_LOG];
   }
   
-  // 최초 로드 시 DOM이 준비되었다면 렌더링 (그렇지 않으면 initapp에서 수행됨)
+  // 첫 로드 후 렌더링
   if ($('exercise-list')) renderExerciseLog();
+}
+
+function handleLogout() {
+  AUTH_TOKEN = null;
+  AUTH_USER = null;
+  localStorage.removeItem('fitpro_token');
+  localStorage.removeItem('fitpro_user');
+  EXERCISE_LOG = [];
+  $('auth-overlay').style.display = 'flex';
 }
 
 // ── State ─────────────────────────────────────────────────────────
@@ -308,7 +330,7 @@ async function addExercise() {
   try {
     const response = await fetch(`${API_BASE}/exercises`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(newEx)
     });
     
@@ -337,7 +359,10 @@ async function addExercise() {
 
 async function deleteExercise(id) {
   try {
-    const res = await fetch(`${API_BASE}/exercises/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${API_BASE}/exercises/${id}`, { 
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
     if(res.ok) {
       await loadExercises(); // 목록 갱신
       
@@ -512,7 +537,7 @@ function initOCR() {
     try {
       const resp = await fetch(`${API_BASE}/exercises`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(parsedData)
       });
       
@@ -577,8 +602,104 @@ function initMobile() {
   });
 }
 
+// ── Auth ──────────────────────────────────────────────────────────
+function initAuth() {
+  const overlay = $('auth-overlay');
+  
+  // 토큰 여부 확인
+  if (AUTH_TOKEN && AUTH_USER) {
+    overlay.style.display = 'none';
+    const avatar = $('sidebar-avatar');
+    const uname = $('sidebar-username');
+    if (avatar) avatar.textContent = AUTH_USER.charAt(0).toUpperCase();
+    if (uname) uname.textContent = AUTH_USER;
+    loadExercises();
+  } else {
+    overlay.style.display = 'flex';
+  }
+
+  // 탭 전환 로직
+  document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const mode = tab.dataset.tab;
+      if (mode === 'login') {
+        $('auth-login-form').style.display = 'block';
+        $('auth-register-form').style.display = 'none';
+      } else {
+        $('auth-login-form').style.display = 'none';
+        $('auth-register-form').style.display = 'block';
+      }
+    });
+  });
+
+  async function handleAuthAPI(url, data, msgElId) {
+    const msgEl = $(msgElId);
+    msgEl.style.color = 'var(--text-secondary)';
+    msgEl.textContent = '⏳ 처리 중...';
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await resp.json();
+      if(!resp.ok) throw new Error(result.error || '접속 실패');
+      
+      // 토큰 저장
+      AUTH_TOKEN = result.token;
+      AUTH_USER = result.username;
+      localStorage.setItem('fitpro_token', AUTH_TOKEN);
+      localStorage.setItem('fitpro_user', AUTH_USER);
+      
+      msgEl.style.color = 'var(--accent-green)';
+      msgEl.textContent = '✅ 성공적으로 로그인되었습니다.';
+      
+      const avatar = $('sidebar-avatar');
+      const uname = $('sidebar-username');
+      if (avatar) avatar.textContent = AUTH_USER.charAt(0).toUpperCase();
+      if (uname) uname.textContent = AUTH_USER;
+      
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        loadExercises(); // 데이터 연동
+      }, 500);
+
+    } catch(e) {
+      msgEl.style.color = 'var(--accent-secondary)';
+      msgEl.textContent = `❌ ${e.message}`;
+    }
+  }
+
+  // 로그인 버튼
+  const btnLogin = $('btn-login');
+  if(btnLogin) btnLogin.addEventListener('click', () => {
+    const u = $('login-username').value.trim();
+    const p = $('login-password').value.trim();
+    if(!u || !p) return;
+    handleAuthAPI(`${API_BASE}/auth/login`, { username: u, password: p }, 'auth-msg-login');
+  });
+
+  // 회원가입 버튼
+  const btnReg = $('btn-register');
+  if(btnReg) btnReg.addEventListener('click', () => {
+    const u = $('register-username').value.trim();
+    const p = $('register-password').value.trim();
+    if(!u || !p) return;
+    handleAuthAPI(`${API_BASE}/auth/register`, { username: u, password: p }, 'auth-msg-register');
+  });
+  
+  // 로그아웃
+  const btnLogout = $('btn-logout');
+  if(btnLogout) btnLogout.addEventListener('click', () => {
+    handleLogout();
+  });
+}
+
 // ── Init ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  initAuth();
   initNav();
   initMobile();
   initTabs();
@@ -588,11 +709,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if($('ex-date')) $('ex-date').value = today.toISOString().split('T')[0];
   if($('gcal-event-date')) $('gcal-event-date').value = today.toISOString().split('T')[0];
 
-  // 기본 페이지: dashboard
+  // 데이터 등 초기 렌더링 호출
   switchPage('dashboard');
   renderDashboard();
   renderMealPlan(1); // 기본은 3월 3주차 (인덱스 1)
-  renderExerciseLog();
+  // 초기 운동 기록 통계 보충
+  if(AUTH_TOKEN) renderExerciseLog(); 
   renderGoals();
   renderRunning();
 
