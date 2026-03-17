@@ -1,17 +1,57 @@
+version: '3.8'
+
 services:
-  fitpro:
+  db:
+    image: mariadb:10-focal
+    container_name: fitpro-mariadb
+    restart: always
+    environment:
+      MYSQL_USER: fitpro_user
+      MYSQL_PASSWORD: fitpro_password
+      MYSQL_DATABASE: fitpro_db
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - fitpro-db-data:/var/lib/mysql
+      - ./server/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: fitpro-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=fitpro_user
+      - DB_PASSWORD=fitpro_password
+      - DB_NAME=fitpro_db
+      - PORT=5000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
     build: .
     container_name: fitpro-app
     ports:
       - "8080:80"
-    # 개발 시 소스 파일 볼륨 마운트 (파일 수정 즉시 반영)
     volumes:
       - ./index.html:/usr/share/nginx/html/index.html:ro
       - ./style.css:/usr/share/nginx/html/style.css:ro
       - ./app.js:/usr/share/nginx/html/app.js:ro
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
+    depends_on:
+      - backend
+
+volumes:
+  fitpro-db-data:

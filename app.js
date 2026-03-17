@@ -48,14 +48,26 @@ const DEFAULT_EXERCISE_LOG = [
   { id:3, date:'2026-03-10', type:'등산', title:'관악산 등반 (초보 코스)', duration:180, cal:1200 },
 ];
 
-// 로컬 스토리지에서 운동 기록 불러오기 (없으면 기본값 세팅 후 저장)
+// 로컬 스토리지 대신 서버 DB에서 운동 기록 불러오기 위한 상태
 let EXERCISE_LOG = [];
-const savedLogs = localStorage.getItem('fitpro_exercises');
-if (savedLogs) {
-  EXERCISE_LOG = JSON.parse(savedLogs);
-} else {
-  EXERCISE_LOG = [...DEFAULT_EXERCISE_LOG];
-  localStorage.setItem('fitpro_exercises', JSON.stringify(EXERCISE_LOG));
+const API_BASE = 'http://localhost:5000/api';
+
+async function loadExercises() {
+  try {
+    const res = await fetch(`${API_BASE}/exercises`);
+    if (res.ok) {
+      EXERCISE_LOG = await res.json();
+    } else {
+      console.warn('DB에서 데이터를 가져오지 못해 기본값을 사용합니다.');
+      EXERCISE_LOG = [...DEFAULT_EXERCISE_LOG];
+    }
+  } catch (e) {
+    console.error('API 연결 실패:', e);
+    EXERCISE_LOG = [...DEFAULT_EXERCISE_LOG];
+  }
+  
+  // 최초 로드 시 DOM이 준비되었다면 렌더링 (그렇지 않으면 initapp에서 수행됨)
+  if ($('exercise-list')) renderExerciseLog();
 }
 
 // ── State ─────────────────────────────────────────────────────────
@@ -233,8 +245,9 @@ function renderMealPlan(weekIndex = 1) {
 }
 
 // ── Exercise Log ──────────────────────────────────────────────────
+// (기존 디버깅용 로컬 스토리지 저장은 백엔드 DB 저장으로 대체되므로 제외)
 function saveExerciseLog() {
-  localStorage.setItem('fitpro_exercises', JSON.stringify(EXERCISE_LOG));
+  // deprecated: Fetch API 사용함
 }
 
 function renderExerciseLog() {
@@ -268,7 +281,7 @@ function renderExerciseLog() {
   });
 }
 
-function addExercise() {
+async function addExercise() {
   const inputs = [$('ex-type'), $('ex-name'), $('ex-duration'), $('ex-calories')];
   const todayDateStr = $('ex-date').value;
   const msgEl = $('ex-msg');
@@ -292,38 +305,54 @@ function addExercise() {
     return;
   }
   
-  EXERCISE_LOG.unshift(newEx); // 최신 항목을 맨 앞에 추가
-  saveExerciseLog();           // 로컬 스토리지에 저장
-  renderExerciseLog();
-  
-  // 성공 메시지
-  if (msgEl) {
-    msgEl.style.display = 'block';
-    msgEl.style.color = 'var(--accent-green)';
-    msgEl.textContent = '✅ 운동 기록이 추가되었습니다.';
-    setTimeout(() => msgEl.style.display = 'none', 2000);
-  }
+  try {
+    const response = await fetch(`${API_BASE}/exercises`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newEx)
+    });
+    
+    if(response.ok) {
+      // 서버에서 저장 성공 후 목록 갱신
+      await loadExercises();
+      
+      // 성공 메시지
+      if (msgEl) {
+        msgEl.style.display = 'block';
+        msgEl.style.color = 'var(--accent-green)';
+        msgEl.textContent = '✅ 운동 기록이 데이터베이스에 저장되었습니다.';
+        setTimeout(() => msgEl.style.display = 'none', 2000);
+      }
 
-  // 입력 폼 초기화
-  inputs.forEach((i, idx) => { if (idx > 0) i.value=''; }); // 종류(select)는 유지
+      // 입력 폼 초기화
+      inputs.forEach((i, idx) => { if (idx > 0) i.value=''; }); // 종류(select)는 유지
+    } else {
+      throw new Error('Server returned an error');
+    }
+  } catch(e) {
+    console.error('저장 실패:', e);
+    alert('서버 저장에 실패했습니다. 백엔드와 DB가 켜져 있는지 확인해주세요.');
+  }
 }
 
-function deleteExercise(id) {
-  // id 타입 불일치 방지를 위해 무조건 String 변환 후 비교
-  const idx = EXERCISE_LOG.findIndex(e => String(e.id) === String(id));
-  if(idx !== -1) {
-    EXERCISE_LOG.splice(idx, 1);
-    saveExerciseLog();     // 로컬 스토리지 업데이트
-    renderExerciseLog();
-    
-    // 삭제 피드백
-    const msgEl = $('ex-msg');
-    if (msgEl) {
-      msgEl.style.display = 'block';
-      msgEl.style.color = 'var(--text-muted)';
-      msgEl.textContent = '🗑️ 운동 기록이 삭제되었습니다.';
-      setTimeout(() => msgEl.style.display = 'none', 2000);
+async function deleteExercise(id) {
+  try {
+    const res = await fetch(`${API_BASE}/exercises/${id}`, { method: 'DELETE' });
+    if(res.ok) {
+      await loadExercises(); // 목록 갱신
+      
+      // 삭제 피드백
+      const msgEl = $('ex-msg');
+      if (msgEl) {
+        msgEl.style.display = 'block';
+        msgEl.style.color = 'var(--text-muted)';
+        msgEl.textContent = '🗑️ 운동 기록이 DB에서 삭제되었습니다.';
+        setTimeout(() => msgEl.style.display = 'none', 2000);
+      }
     }
+  } catch(e) {
+    console.error('삭제 실패:', e);
+    alert('운동 기록 삭제 중 서버 에러가 발생했습니다.');
   }
 }
 
@@ -477,25 +506,37 @@ function initOCR() {
   });
 
   // 즉시 저장 버튼 클릭
-  btnSave.addEventListener('click', () => {
+  btnSave.addEventListener('click', async () => {
     if (!parsedData) return;
-    EXERCISE_LOG.unshift(parsedData);
-    saveExerciseLog();
-    renderExerciseLog();
     
-    // UI 원복 및 토스트나 알림
-    ocrResult.style.display = 'none';
-    
-    ocrStatus.style.display = 'block';
-    ocrMsg.style.color = 'var(--accent-green)';
-    ocrMsg.textContent = '✅ 운동 기록에 성공적으로 저장되었습니다!';
-    
-    setTimeout(() => {
-      ocrStatus.style.display = 'none';
-      // 운동 탭으로 자동 이동
-      switchPage('exercise');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 1500);
+    try {
+      const resp = await fetch(`${API_BASE}/exercises`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsedData)
+      });
+      
+      if(resp.ok) {
+        await loadExercises();
+        
+        // UI 원복 및 토스트나 알림
+        ocrResult.style.display = 'none';
+        
+        ocrStatus.style.display = 'block';
+        ocrMsg.style.color = 'var(--accent-green)';
+        ocrMsg.textContent = '✅ 운동 기록에 성공적으로 DB에 저장되었습니다!';
+        
+        setTimeout(() => {
+          ocrStatus.style.display = 'none';
+          // 운동 탭으로 자동 이동
+          switchPage('exercise');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 1500);
+      }
+    } catch(e) {
+      console.error(e);
+      alert('저장 실패. 서버를 확인해주세요.');
+    }
   });
 }
 
