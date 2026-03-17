@@ -259,6 +259,7 @@ function renderExerciseLog() {
 function addExercise() {
   const inputs = [$('ex-type'), $('ex-name'), $('ex-duration'), $('ex-calories')];
   const todayDateStr = $('ex-date').value;
+  const msgEl = $('ex-msg');
 
   const newEx = {
     id: Date.now(),
@@ -270,7 +271,12 @@ function addExercise() {
   };
   
   if(!newEx.type || !newEx.title || !newEx.duration || !newEx.cal) {
-    alert('모든 필드를 입력해주세요.');
+    if (msgEl) {
+      msgEl.style.display = 'block';
+      msgEl.style.color = 'var(--accent-secondary)';
+      msgEl.textContent = '❌ 종목명, 시간, 칼로리를 모두 입력해주세요.';
+      setTimeout(() => msgEl.style.display = 'none', 3000);
+    }
     return;
   }
   
@@ -278,18 +284,24 @@ function addExercise() {
   saveExerciseLog();           // 로컬 스토리지에 저장
   renderExerciseLog();
   
+  // 성공 메시지
+  if (msgEl) {
+    msgEl.style.display = 'block';
+    msgEl.style.color = 'var(--accent-green)';
+    msgEl.textContent = '✅ 운동 기록이 추가되었습니다.';
+    setTimeout(() => msgEl.style.display = 'none', 2000);
+  }
+
   // 입력 폼 초기화
-  inputs.forEach(i => i.value='');
+  inputs.forEach((i, idx) => { if (idx > 0) i.value=''; }); // 종류(select)는 유지
 }
 
 function deleteExercise(id) {
-  if(confirm('이 기록을 삭제하시겠습니까?')) {
-    const idx = EXERCISE_LOG.findIndex(e => e.id === id);
-    if(idx !== -1) {
-      EXERCISE_LOG.splice(idx, 1);
-      saveExerciseLog();     // 로컬 스토리지 업데이트
-      renderExerciseLog();
-    }
+  const idx = EXERCISE_LOG.findIndex(e => e.id === id);
+  if(idx !== -1) {
+    EXERCISE_LOG.splice(idx, 1);
+    saveExerciseLog();     // 로컬 스토리지 업데이트
+    renderExerciseLog();
   }
 }
 
