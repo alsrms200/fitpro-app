@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitPro – 피트니스 관리</title>
+<meta name="description" content="개인 피트니스 관리 앱 – 식단, 운동, 체성분 분석">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar-overlay"></div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">💪</div>
+    <h2>FitPro</h2>
+    <p>개인 피트니스 관리</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">메인</div>
+    <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span> 대시보드</div>
+    <div class="nav-item" data-page="meal"><span class="nav-icon">🍱</span> 식단 계획</div>
+
+    <div class="nav-section-title">운동</div>
+    <div class="nav-item" data-page="exercise"><span class="nav-icon">🏋️</span> 운동 기록</div>
+    <div class="nav-item" data-page="running"><span class="nav-icon">🏃</span> 러닝 기록</div>
+
+    <div class="nav-section-title">분석</div>
+    <div class="nav-item" data-page="goals"><span class="nav-icon">🎯</span> 목표 & 분석</div>
+
+    <div class="nav-section-title">연동</div>
+    <div class="nav-item" data-page="calendar"><span class="nav-icon">📅</span> 구글 캘린더</div>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="profile-avatar">J</div>
+    <div class="profile-info">
+      <p>제이슨</p>
+      <span>39세 · 185cm · 88kg</span>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile topbar -->
+<div class="mobile-topbar">
+  <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+  <span class="mobile-title">💪 FitPro</span>
+  <span style="font-size:11px;color:var(--text-muted)">39세 · 88kg</span>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-item active" data-page="dashboard">
+    <span class="bnav-icon">📊</span>대시보드
+  </button>
+  <button class="bottom-nav-item" data-page="meal">
+    <span class="bnav-icon">🍱</span>식단
+  </button>
+  <button class="bottom-nav-item" data-page="exercise">
+    <span class="bnav-icon">🏋️</span>운동
+  </button>
+  <button class="bottom-nav-item" data-page="running">
+    <span class="bnav-icon">🏃</span>러닝
+  </button>
+  <button class="bottom-nav-item" data-page="goals">
+    <span class="bnav-icon">🎯</span>목표
+  </button>
+  <button class="bottom-nav-item" data-page="calendar">
+    <span class="bnav-icon">📅</span>캘린더
+  </button>
+</nav>
+
+<!-- Main -->
+<div class="main-content">
+
+  <!-- ━━━━━━━━━━ DASHBOARD ━━━━━━━━━━ -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <h1>대시보드 📊</h1>
+      <p>2026년 3월 17일 화요일 · 오늘의 피트니스 현황</p>
+    </div>
+
+    <!-- 핵심 지표 -->
+    <div class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-icon purple">⚖️</div>
+        <div class="stat-value" id="val-weight">--</div>
+        <div class="stat-label">현재 체중</div>
+        <span class="stat-change negative">목표: -8.2kg</span>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon red">🔥</div>
+        <div class="stat-value" id="val-fat-pct">--</div>
+        <div class="stat-label">체지방률</div>
+        <span class="stat-change negative">표준 초과 (10~20%)</span>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon green">💪</div>
+        <div class="stat-value" id="val-muscle">--</div>
+        <div class="stat-label">골격근량</div>
+        <span class="stat-change positive">표준 범위 내</span>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon blue">📋</div>
+        <div class="stat-value" id="val-bmi">--</div>
+        <div class="stat-label">BMI 지수</div>
+        <span class="stat-change negative">과체중 (표준 18.5~23)</span>
+      </div>
+    </div>
+
+    <!-- 체성분 & 영양 -->
+    <div class="grid-auto">
+      <!-- 체성분 분석 -->
+      <div class="card">
+        <div class="card-title">🧬 체성분 분석 (인바디 2026.03.17)</div>
+        <div class="body-comp-item">
+          <div class="body-comp-header">
+            <span class="body-comp-label">체지방량</span>
+            <span class="body-comp-value" style="color:var(--accent-secondary)">20.2 kg</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill red" id="bar-fat" style="width:0"></div></div>
+          <div class="body-comp-range">표준: 9.0 ~ 18.1 kg &nbsp;|&nbsp; <span style="color:var(--accent-secondary)">▲ 표준 초과</span></div>
+        </div>
+        <div class="body-comp-item">
+          <div class="body-comp-header">
+            <span class="body-comp-label">골격근량</span>
+            <span class="body-comp-value" style="color:var(--accent-green)">38.6 kg</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill purple" id="bar-muscle" style="width:0"></div></div>
+          <div class="body-comp-range">표준: 32.4 ~ 39.6 kg &nbsp;|&nbsp; <span style="color:var(--accent-green)">✓ 표준</span></div>
+        </div>
+        <div class="body-comp-item">
+          <div class="body-comp-header">
+            <span class="body-comp-label">체수분</span>
+            <span class="body-comp-value">49.5 L</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill blue" id="bar-water" style="width:0"></div></div>
+          <div class="body-comp-range">표준: 42.3 ~ 51.7 L</div>
+        </div>
+        <div class="body-comp-item">
+          <div class="body-comp-header">
+            <span class="body-comp-label">단백질</span>
+            <span class="body-comp-value">13.5 kg</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill green" id="bar-protein" style="width:0"></div></div>
+          <div class="body-comp-range">표준: 11.3 ~ 13.9 kg</div>
+        </div>
+        <hr>
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div><div style="font-size:11px;color:var(--text-muted)">기초대사량</div><div style="font-size:18px;font-weight:800">1,835 <span style="font-size:12px">kcal</span></div></div>
+          <div><div style="font-size:11px;color:var(--text-muted)">복부지방율</div><div style="font-size:18px;font-weight:800">0.84 <span style="font-size:12px;color:var(--accent-green)">표준</span></div></div>
+          <div><div style="font-size:11px;color:var(--text-muted)">피트니스 점수</div><div style="font-size:18px;font-weight:800">76 <span style="font-size:12px">점</span></div></div>
+          <div><div style="font-size:11px;color:var(--text-muted)">내장지방</div><div style="font-size:18px;font-weight:800">낮음 <span style="font-size:12px;color:var(--accent-green)">✓</span></div></div>
+        </div>
+      </div>
+
+      <!-- 오늘 권장 영양 -->
+      <div class="card">
+        <div class="card-title">🥗 오늘 권장 영양소</div>
+        <div style="text-align:center;margin-bottom:16px">
+          <div style="font-size:36px;font-weight:900;letter-spacing:-2px">1,900 <span style="font-size:16px;font-weight:500;color:var(--text-muted)">kcal</span></div>
+          <div style="font-size:12px;color:var(--text-muted)">일일 권장 섭취 칼로리</div>
+        </div>
+        <div class="nutrition-circles">
+          <div class="nutrition-circle">
+            <div class="circle-ring" id="circle-carb">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle class="circle-bg" cx="40" cy="40" r="32"/>
+                <circle class="circle-fill" cx="40" cy="40" r="32" stroke-dasharray="201" stroke-dashoffset="201"/>
+              </svg>
+              <div class="circle-center">0%</div>
+            </div>
+            <div class="nutrition-label">탄수화물</div>
+            <div class="nutrition-gram">--</div>
+          </div>
+          <div class="nutrition-circle">
+            <div class="circle-ring" id="circle-protein">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle class="circle-bg" cx="40" cy="40" r="32"/>
+                <circle class="circle-fill" cx="40" cy="40" r="32" stroke-dasharray="201" stroke-dashoffset="201"/>
+              </svg>
+              <div class="circle-center">0%</div>
+            </div>
+            <div class="nutrition-label">단백질</div>
+            <div class="nutrition-gram">--</div>
+          </div>
+          <div class="nutrition-circle">
+            <div class="circle-ring" id="circle-fat">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle class="circle-bg" cx="40" cy="40" r="32"/>
+                <circle class="circle-fill" cx="40" cy="40" r="32" stroke-dasharray="201" stroke-dashoffset="201"/>
+              </svg>
+              <div class="circle-center">0%</div>
+            </div>
+            <div class="nutrition-label">지방</div>
+            <div class="nutrition-gram">--</div>
+          </div>
+        </div>
+        <hr>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.8">
+          💡 <strong style="color:var(--text-primary)">체지방 감량 전략</strong><br>
+          기초대사량 1,835kcal 기준, 하루 300~500kcal 결손<br>
+          주 4회 운동 + 단백질 강화 식단 권장
+        </div>
+      </div>
+    </div>
+
+    <!-- 하프마라톤 하이라이트 -->
+    <div class="card">
+      <div class="card-title">🏃 최근 운동 하이라이트</div>
+      <div class="running-highlight-flex" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:8px 0">
+        <div style="font-size:48px">🥈</div>
+        <div style="flex:1">
+          <div style="font-size:20px;font-weight:800">하프마라톤 완주 · 1:56:43</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:4px">2026년 3월 17일 · 21.1km</div>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            <span class="tag tag-green">전체 289위 / 921명</span>
+            <span class="tag tag-purple">남자 270위 / 772명</span>
+            <span class="tag tag-orange">40대이상 89위 / 234명</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;color:var(--text-muted)">소모 칼로리</div>
+          <div style="font-size:32px;font-weight:900;color:var(--accent-orange)">1,150</div>
+          <div style="font-size:12px;color:var(--text-muted)">kcal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━ MEAL PLAN ━━━━━━━━━━ -->
+  <div class="page" id="page-meal">
+    <div class="page-header">
+      <h1>식단 계획 🍱</h1>
+      <p>2026년 3월 3주차 · 체지방 감량 맞춤 식단 (1,900 kcal/일)</p>
+    </div>
+
+    <!-- 칼로리 가이드 -->
+    <div class="calorie-summary">
+      <div class="cal-item">
+        <div class="value" style="color:var(--accent-green)">1,900</div>
+        <div class="label">권장 칼로리</div>
+      </div>
+      <div class="cal-divider"></div>
+      <div class="cal-item">
+        <div class="value" style="color:var(--accent-primary)">1,835</div>
+        <div class="label">기초대사량</div>
+      </div>
+      <div class="cal-divider"></div>
+      <div class="cal-item">
+        <div class="value" style="color:var(--accent-orange)">261g</div>
+        <div class="label">탄수화물</div>
+      </div>
+      <div class="cal-divider"></div>
+      <div class="cal-item">
+        <div class="value" style="color:var(--accent-blue)">119g</div>
+        <div class="label">단백질</div>
+      </div>
+      <div class="cal-divider"></div>
+      <div class="cal-item">
+        <div class="value" style="color:var(--accent-secondary)">42g</div>
+        <div class="label">지방</div>
+      </div>
+      <div class="cal-divider"></div>
+      <div class="cal-bar-wrap">
+        <div class="cal-bar-labels"><span>0</span><span>권장 1,900kcal</span></div>
+        <div class="cal-bar"><div class="cal-bar-fill" style="width:100%"></div></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:6px">💡 주 4회 운동 시 실질 칼로리 결손 발생 → 주당 약 0.3~0.5kg 감량 예상</div>
+      </div>
+    </div>
+
+    <!-- 식단표 (3월 16일 월 ~ 3월 22일 일 / 오늘 = 화 3/17) -->
+    <div class="meal-grid-wrapper">
+    <div class="meal-grid-inner" id="meal-grid"></div>
+    </div><!-- /meal-grid-wrapper -->
+
+    <!-- 식단 팁 -->
+    <div class="card" style="margin-top:0px">
+      <div class="card-title">💡 식단 가이드라인</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px">
+        <div style="background:rgba(108,99,255,0.1);border-radius:12px;padding:16px">
+          <div style="font-size:20px;margin-bottom:8px">🥩</div>
+          <div style="font-weight:700;margin-bottom:4px">단백질 강화</div>
+          <div style="font-size:12px;color:var(--text-muted)">체중 x 1.5 = 132g/일<br>근육 유지 + 포만감 증가</div>
+        </div>
+        <div style="background:rgba(67,233,123,0.1);border-radius:12px;padding:16px">
+          <div style="font-size:20px;margin-bottom:8px">🌾</div>
+          <div style="font-weight:700;margin-bottom:4px">정제당 제한</div>
+          <div style="font-size:12px;color:var(--text-muted)">현미·귀리·고구마 등<br>복합탄수화물 위주</div>
+        </div>
+        <div style="background:rgba(79,172,254,0.1);border-radius:12px;padding:16px">
+          <div style="font-size:20px;margin-bottom:8px">💧</div>
+          <div style="font-weight:700;margin-bottom:4px">수분 보충</div>
+          <div style="font-size:12px;color:var(--text-muted)">하루 2.5L 이상<br>운동 전후 충분히 섭취</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━ EXERCISE ━━━━━━━━━━ -->
+  <div class="page" id="page-exercise">
+    <div class="page-header">
+      <h1>운동 기록 🏋️</h1>
+      <p>운동 내용을 기록하고 칼로리 소모를 관리하세요</p>
+    </div>
+
+    <!-- 운동 입력 폼 -->
+    <div class="exercise-form">
+      <div class="card-title">➕ 운동 추가</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>운동 종류</label>
+          <select id="ex-type">
+            <option value="running">🏃 러닝</option>
+            <option value="weight">🏋️ 웨이트</option>
+            <option value="cycling">🚴 사이클</option>
+            <option value="swimming">🏊 수영</option>
+            <option value="other">⚡ 기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>종목명</label>
+          <input type="text" id="ex-name" placeholder="예: 하프마라톤">
+        </div>
+        <div class="form-group">
+          <label>날짜</label>
+          <input type="date" id="ex-date">
+        </div>
+        <div class="form-group">
+          <label>시간 (분)</label>
+          <input type="number" id="ex-duration" placeholder="60" min="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>거리 (km, 선택)</label>
+          <input type="number" id="ex-distance" placeholder="21.1" step="0.1" min="0">
+        </div>
+        <div class="form-group">
+          <label>소모 칼로리 (kcal)</label>
+          <input type="number" id="ex-calories" placeholder="500" min="1">
+        </div>
+        <div class="form-group" style="grid-column:span 2">
+          <label>메모</label>
+          <input type="text" id="ex-note" placeholder="기록, 느낀점 등">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-add-exercise">➕ 기록 추가</button>
+    </div>
+
+    <!-- 운동 통계 -->
+    <div class="grid-3" style="margin-bottom:20px">
+      <div class="stat-card green">
+        <div class="stat-icon green">🏃</div>
+        <div class="stat-value">28.6<span style="font-size:14px">km</span></div>
+        <div class="stat-label">이번 달 러닝 거리</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon orange">🔥</div>
+        <div class="stat-value">1,950<span style="font-size:14px">kcal</span></div>
+        <div class="stat-label">이번 달 소모 칼로리</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon purple">⏱️</div>
+        <div class="stat-value">221<span style="font-size:14px">분</span></div>
+        <div class="stat-label">이번 달 운동 시간</div>
+      </div>
+    </div>
+
+    <!-- 운동 목록 -->
+    <div class="card">
+      <div class="card-title">📋 운동 기록</div>
+      <div class="exercise-list" id="exercise-list"></div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━ RUNNING ━━━━━━━━━━ -->
+  <div class="page" id="page-running">
+    <div class="page-header">
+      <h1>러닝 기록 🏃</h1>
+      <p>마라톤 & 러닝 기록 분석</p>
+    </div>
+
+    <!-- 대회 기록 -->
+    <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(67,233,123,0.1),rgba(108,99,255,0.1));border-color:rgba(67,233,123,0.3)">
+      <div class="card-title">🥈 하프마라톤 공식 기록</div>
+      <div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap;padding:12px 0">
+        <div style="text-align:center">
+          <div style="font-size:48px;font-weight:900;letter-spacing:-3px;background:var(--gradient-green);-webkit-background-clip:text;-webkit-text-fill-color:transparent">1:56:43</div>
+          <div style="font-size:13px;color:var(--text-muted)">공식 기록 (2026.03.12)</div>
+        </div>
+        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">전체 순위</div>
+            <div style="font-size:24px;font-weight:800">289<span style="font-size:13px;color:var(--text-muted)">/921</span></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">남자 순위</div>
+            <div style="font-size:24px;font-weight:800">270<span style="font-size:13px;color:var(--text-muted)">/772</span></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">40대이상 순위</div>
+            <div style="font-size:24px;font-weight:800">89<span style="font-size:13px;color:var(--text-muted)">/234</span></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:14px;text-align:center">
+            <div style="font-size:11px;color:var(--text-muted)">km 페이스</div>
+            <div style="font-size:24px;font-weight:800">5:32<span style="font-size:13px;color:var(--text-muted)">/km</span></div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div><span style="font-size:12px;color:var(--text-muted)">Start:</span> <strong>09:00:23</strong></div>
+        <div><span style="font-size:12px;color:var(--text-muted)">Finish:</span> <strong>10:57:06</strong></div>
+        <div><span style="font-size:12px;color:var(--text-muted)">Section 1 (하프):</span> <strong>58:33</strong></div>
+        <div><span style="font-size:12px;color:var(--text-muted)">총 소모:</span> <strong style="color:var(--accent-orange)">약 1,150 kcal</strong></div>
+      </div>
+    </div>
+
+    <!-- 러닝 지표 -->
+    <div class="record-grid">
+      <div class="record-card">
+        <div class="record-icon">⚡</div>
+        <div class="record-value" style="color:var(--accent-green)">5:32</div>
+        <div class="record-label">평균 페이스 (분/km)</div>
+        <div class="record-date">하프마라톤 기준</div>
+      </div>
+      <div class="record-card">
+        <div class="record-icon">🏁</div>
+        <div class="record-value" style="color:var(--accent-primary)">21.1</div>
+        <div class="record-label">완주 거리 (km)</div>
+        <div class="record-date">2026.03.12</div>
+      </div>
+      <div class="record-card">
+        <div class="record-icon">🔥</div>
+        <div class="record-value" style="color:var(--accent-orange)">1,150</div>
+        <div class="record-label">소모 칼로리 (kcal)</div>
+        <div class="record-date">88kg 기준 추산</div>
+      </div>
+    </div>
+
+    <!-- 목표 -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">🎯 다음 러닝 목표</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+        <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px">하프마라톤 목표 기록</div>
+          <div style="font-size:28px;font-weight:900;color:var(--accent-green)">1:50:00</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">현재 대비 6분 43초 단축</div>
+          <div class="progress-bar" style="margin-top:12px">
+            <div class="progress-fill green" style="width:74%"></div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px">주간 러닝 거리 목표</div>
+          <div style="font-size:28px;font-weight:900;color:var(--accent-primary)">30 km</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">이번 주 28.6km 완료</div>
+          <div class="progress-bar" style="margin-top:12px">
+            <div class="progress-fill purple" style="width:95%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━ GOALS ━━━━━━━━━━ -->
+  <div class="page" id="page-goals">
+    <div class="page-header">
+      <h1>목표 & 분석 🎯</h1>
+      <p>체지방 감량 목표 및 신체 변화 분석</p>
+    </div>
+
+    <div class="grid-2">
+      <!-- 목표 -->
+      <div class="card">
+        <div class="card-title">🎯 현재 목표</div>
+        <div class="goal-item" style="margin-top:12px">
+          <div class="goal-icon">🔥</div>
+          <div class="goal-detail">
+            <div class="goal-title">체지방 감량</div>
+            <div class="goal-sub">20.2kg → 12.0kg (목표 -8.2kg)</div>
+            <div class="progress-bar" style="margin-top:6px">
+              <div class="progress-fill red" id="goal-fat-bar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="goal-pct">0%</div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-icon">📊</div>
+          <div class="goal-detail">
+            <div class="goal-title">BMI 정상화</div>
+            <div class="goal-sub">25.7 → 23.0 이하 목표</div>
+            <div class="progress-bar" style="margin-top:6px">
+              <div class="progress-fill orange" id="goal-bmi-bar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="goal-pct">85%</div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-icon">⚡</div>
+          <div class="goal-detail">
+            <div class="goal-title">피트니스 점수</div>
+            <div class="goal-sub">현재 76점 → 목표 85점</div>
+            <div class="progress-bar" style="margin-top:6px">
+              <div class="progress-fill purple" id="fitness-score-bar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="goal-pct"><span id="fitness-score-val">0</span></div>
+        </div>
+      </div>
+
+      <!-- 인바디 요약 -->
+      <div class="card">
+        <div class="card-title">📋 인바디 종합 평가</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(67,233,123,0.08);border-radius:10px;border:1px solid rgba(67,233,123,0.2)">
+            <span style="font-size:13px">골격근량</span>
+            <span style="font-size:13px;font-weight:700;color:var(--accent-green)">✓ 표준 (38.6kg)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,101,132,0.08);border-radius:10px;border:1px solid rgba(255,101,132,0.2)">
+            <span style="font-size:13px">체지방률</span>
+            <span style="font-size:13px;font-weight:700;color:var(--accent-secondary)">▲ 표준초과 (22.9%)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(67,233,123,0.08);border-radius:10px;border:1px solid rgba(67,233,123,0.2)">
+            <span style="font-size:13px">복부지방률</span>
+            <span style="font-size:13px;font-weight:700;color:var(--accent-green)">✓ 표준 (0.84)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(67,233,123,0.08);border-radius:10px;border:1px solid rgba(67,233,123,0.2)">
+            <span style="font-size:13px">내장지방</span>
+            <span style="font-size:13px;font-weight:700;color:var(--accent-green)">✓ 낮음 (7레벨)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,101,132,0.08);border-radius:10px;border:1px solid rgba(255,101,132,0.2)">
+            <span style="font-size:13px">BMI</span>
+            <span style="font-size:13px;font-weight:700;color:var(--accent-secondary)">▲ 과체중 (25.7)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(108,99,255,0.08);border-radius:10px;border:1px solid rgba(108,99,255,0.2)">
+            <span style="font-size:13px">기초대사량</span>
+            <span style="font-size:13px;font-weight:700;color:var(--accent-primary)">✓ 표준 (1,835kcal)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 감량 계획 -->
+    <div class="card">
+      <div class="card-title">📅 체지방 감량 로드맵</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px">
+        <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text-muted)">3월 목표</div>
+          <div style="font-size:22px;font-weight:800;color:var(--accent-green);margin:6px 0">-1.5kg</div>
+          <div style="font-size:11px;color:var(--text-muted)">식단 조절 시작</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text-muted)">4월 목표</div>
+          <div style="font-size:22px;font-weight:800;color:var(--accent-primary);margin:6px 0">-2.0kg</div>
+          <div style="font-size:11px;color:var(--text-muted)">운동 강도 증가</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;text-align:center;border:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text-muted)">5월 목표</div>
+          <div style="font-size:22px;font-weight:800;color:var(--accent-orange);margin:6px 0">-2.5kg</div>
+          <div style="font-size:11px;color:var(--text-muted)">유지 + 근육 강화</div>
+        </div>
+        <div style="background:rgba(108,99,255,0.1);border-radius:12px;padding:14px;text-align:center;border:1px solid rgba(108,99,255,0.3)">
+          <div style="font-size:11px;color:var(--text-muted)">6월 목표</div>
+          <div style="font-size:22px;font-weight:800;color:var(--accent-secondary);margin:6px 0">-8.2kg</div>
+          <div style="font-size:11px;color:var(--accent-primary);font-weight:700">🎯 최종 목표</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:rgba(108,99,255,0.08);border-radius:12px;font-size:13px;line-height:1.8;color:var(--text-secondary)">
+        💡 <strong style="color:var(--text-primary)">전략 요약</strong>: 하루 1,900kcal 유지 · 주 4회 이상 운동 · 단백질 130g 이상 · 정제당 최소화 · 수분 2.5L/일<br>
+        🏃 현재 하프마라톤 완주 능력(1:56:43)을 활용 → 주 2회 장거리 러닝 + 2회 웨이트 트레이닝 병행 권장
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━━━━━━━━ GOOGLE CALENDAR ━━━━━━━━━━ -->
+  <div class="page" id="page-calendar">
+    <div class="page-header">
+      <h1>구글 캘린더 📅</h1>
+      <p>Google Calendar 연동으로 일정과 운동 스케줄을 한번에 관리</p>
+    </div>
+
+    <!-- 로그인 전 안내 -->
+    <div id="gcal-login-section">
+      <div class="card" style="text-align:center;padding:40px 24px">
+        <div style="font-size:64px;margin-bottom:16px">📅</div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:8px">구글 캘린더 연동</h2>
+        <p style="color:var(--text-muted);margin-bottom:24px;line-height:1.7">Google 계정으로 로그인하면 캘린더 일정을 가져오고<br>운동 스케줄을 자동으로 추가할 수 있습니다.</p>
+        <button id="gcal-signin-btn" class="btn btn-primary" style="font-size:15px;padding:14px 32px">
+          🔐 Google로 로그인
+        </button>
+        <div style="margin-top:20px;padding:14px;background:rgba(108,99,255,0.08);border-radius:12px;font-size:12px;color:var(--text-muted);text-align:left">
+          <strong style="color:var(--text-primary)">⚙️ 설정 필요</strong><br>
+          Google Cloud Console에서 <strong>Client ID</strong>를 발급받아<br>
+          아래 설정 영역에 입력해야 연동이 가능합니다.
+          <br><br>
+          <span style="color:var(--accent-green)">✓</span> 읽기: 오늘 일정 조회<br>
+          <span style="color:var(--accent-green)">✓</span> 쓰기: 운동 일정 추가
+        </div>
+      </div>
+
+      <!-- Client ID 설정 -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">⚙️ Google API 설정</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px">
+          <div class="form-group">
+            <label>Google Client ID</label>
+            <input type="text" id="gcal-client-id" placeholder="xxxx.apps.googleusercontent.com" style="font-size:13px">
+          </div>
+          <button class="btn btn-primary" id="gcal-init-btn" style="width:fit-content">🔗 연결 초기화</button>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.8">
+            📖 발급 방법: <a href="https://console.cloud.google.com" target="_blank" style="color:var(--accent-primary)">Google Cloud Console</a> → 사용자 인증 정보 → OAuth 2.0 클라이언트 ID 생성<br>
+            → 승인된 JavaScript 원본: <code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px">http://localhost:9001</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 로그인 후 캘린더 뷰 -->
+    <div id="gcal-main-section" style="display:none">
+      <!-- 사용자 프로필 -->
+      <div class="card" style="display:flex;align-items:center;gap:16px;padding:16px 20px">
+        <img id="gcal-user-avatar" src="" width="44" height="44" style="border-radius:50%;background:#333" alt="">
+        <div>
+          <div id="gcal-user-name" style="font-weight:700"></div>
+          <div id="gcal-user-email" style="font-size:12px;color:var(--text-muted)"></div>
+        </div>
+        <button id="gcal-signout-btn" class="btn" style="margin-left:auto;background:rgba(255,255,255,0.06);border:1px solid var(--border);font-size:12px;padding:6px 14px">로그아웃</button>
+      </div>
+
+      <!-- 오늘 일정 -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">📋 오늘 일정 (2026년 3월 17일 화)</div>
+        <div id="gcal-events-list" style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+          <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">일정을 불러오는 중...</div>
+        </div>
+        <button id="gcal-refresh-btn" class="btn" style="margin-top:12px;background:rgba(108,99,255,0.12);border:1px solid rgba(108,99,255,0.3);font-size:13px;padding:8px 16px">🔄 새로고침</button>
+      </div>
+
+      <!-- 운동 일정 추가 -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">➕ 운동 일정 캘린더에 추가</div>
+        <div class="form-row" style="margin-top:12px">
+          <div class="form-group">
+            <label>운동 종목</label>
+            <input type="text" id="gcal-event-title" placeholder="예: 하프마라톤 러닝">
+          </div>
+          <div class="form-group">
+            <label>날짜</label>
+            <input type="date" id="gcal-event-date">
+          </div>
+          <div class="form-group">
+            <label>시작 시간</label>
+            <input type="time" id="gcal-event-start" value="07:00">
+          </div>
+          <div class="form-group">
+            <label>종료 시간</label>
+            <input type="time" id="gcal-event-end" value="08:00">
+          </div>
+        </div>
+        <button id="gcal-add-event-btn" class="btn btn-primary" style="margin-top:8px">📅 캘린더에 추가</button>
+        <div id="gcal-add-result" style="margin-top:10px;font-size:13px;display:none"></div>
+      </div>
+
+      <!-- 이번 주 운동 일정 바로 추가 -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">⚡ 이번 주 운동 스케줄 일괄 추가</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">
+          <button class="btn gcal-quick-btn" data-title="러닝 5km" data-date="2026-03-18" data-start="07:00" data-end="08:00"
+            style="background:rgba(67,233,123,0.08);border:1px solid rgba(67,233,123,0.25);padding:12px;text-align:left;border-radius:12px">
+            <div style="font-size:11px;color:var(--text-muted)">수 3/18</div>
+            <div style="font-weight:700">🏃 러닝 5km</div>
+            <div style="font-size:11px;color:var(--text-muted)">07:00 – 08:00</div>
+          </button>
+          <button class="btn gcal-quick-btn" data-title="웨이트 트레이닝" data-date="2026-03-19" data-start="10:00" data-end="11:30"
+            style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.25);padding:12px;text-align:left;border-radius:12px">
+            <div style="font-size:11px;color:var(--text-muted)">목 3/19</div>
+            <div style="font-weight:700">🏋️ 웨이트 트레이닝</div>
+            <div style="font-size:11px;color:var(--text-muted)">10:00 – 11:30</div>
+          </button>
+          <button class="btn gcal-quick-btn" data-title="장거리 러닝 10km" data-date="2026-03-20" data-start="07:00" data-end="08:30"
+            style="background:rgba(67,233,123,0.08);border:1px solid rgba(67,233,123,0.25);padding:12px;text-align:left;border-radius:12px">
+            <div style="font-size:11px;color:var(--text-muted)">금 3/20</div>
+            <div style="font-weight:700">🏃 장거리 러닝 10km</div>
+            <div style="font-size:11px;color:var(--text-muted)">07:00 – 08:30</div>
+          </button>
+          <button class="btn gcal-quick-btn" data-title="웨이트 트레이닝" data-date="2026-03-21" data-start="19:00" data-end="20:30"
+            style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.25);padding:12px;text-align:left;border-radius:12px">
+            <div style="font-size:11px;color:var(--text-muted)">토 3/21</div>
+            <div style="font-weight:700">🏋️ 웨이트 트레이닝</div>
+            <div style="font-size:11px;color:var(--text-muted)">19:00 – 20:30</div>
+          </button>
+        </div>
+        <div id="gcal-quick-result" style="margin-top:10px;font-size:13px;display:none"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- Google API -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js" async defer></script>
+<script src="app.js"></script>
+</body>
+</html>
