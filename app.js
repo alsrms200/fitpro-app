@@ -379,6 +379,7 @@ function initOCR() {
     // UI 상태 초기화
     ocrStatus.style.display = 'block';
     ocrResult.style.display = 'none';
+    ocrMsg.style.color = 'var(--accent-blue)';
     ocrMsg.textContent = '이미지 분석 중... 잠시만 기다려주세요 (0%)';
     parsedData = null;
 
@@ -447,8 +448,10 @@ function initOCR() {
 
       // 실패 처리
       if (!distance && !durationMin) {
-        ocrStatus.style.display = 'none';
-        alert('러닝 기록을 명확히 인식하지 못했습니다. 선명한 스크린샷을 사용하거나 직접 입력해주세요.');
+        ocrStatus.style.display = 'block';
+        ocrMsg.style.color = 'var(--accent-secondary)';
+        ocrMsg.textContent = '❌ 러닝 기록을 명확히 인식하지 못했습니다. 선명한 스크린샷을 사용해주세요.';
+        setTimeout(() => { ocrStatus.style.display = 'none'; }, 4000);
         return;
       }
 
@@ -463,8 +466,10 @@ function initOCR() {
       
     } catch (err) {
       console.error(err);
-      ocrStatus.style.display = 'none';
-      alert('이미지 인식 중 오류가 발생했습니다.');
+      ocrStatus.style.display = 'block';
+      ocrMsg.style.color = 'var(--accent-secondary)';
+      ocrMsg.textContent = '❌ 이미지 인식 중 오류가 발생했습니다.';
+      setTimeout(() => { ocrStatus.style.display = 'none'; }, 4000);
     }
     
     // input 초기화
@@ -480,11 +485,17 @@ function initOCR() {
     
     // UI 원복 및 토스트나 알림
     ocrResult.style.display = 'none';
-    alert('운동 기록에 성공적으로 저장되었습니다!');
     
-    // 운동 탭으로 자동 이동
-    const exerciseTabBtn = document.querySelector('.nav-btn[data-target="page-exercise"]');
-    if (exerciseTabBtn) exerciseTabBtn.click();
+    ocrStatus.style.display = 'block';
+    ocrMsg.style.color = 'var(--accent-green)';
+    ocrMsg.textContent = '✅ 운동 기록에 성공적으로 저장되었습니다!';
+    
+    setTimeout(() => {
+      ocrStatus.style.display = 'none';
+      // 운동 탭으로 자동 이동
+      switchPage('exercise');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 1500);
   });
 }
 
