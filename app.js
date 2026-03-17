@@ -241,7 +241,11 @@ function renderExerciseLog() {
   const list = $('exercise-list');
   if(!list) return;
   const typeLabels = { '러닝':'러닝', '운동':'운동', '사이클':'사이클', '수영':'수영', '등산':'등산', '기타':'기타' };
-  list.innerHTML = EXERCISE_LOG.sort((a,b)=>new Date(b.date).getTime()-new Date(a.date).getTime()).map(ex => `
+  
+  // 원본 배열이 변형되지 않도록 복사본 정렬
+  const sortedLogs = [...EXERCISE_LOG].sort((a,b)=>new Date(b.date).getTime()-new Date(a.date).getTime());
+  
+  list.innerHTML = sortedLogs.map(ex => `
     <div class="exercise-item" id="ex-${ex.id}">
       <span class="exercise-type-badge badge-${ex.type}">${typeLabels[ex.type]||ex.type}</span>
       <div class="exercise-detail">
@@ -252,8 +256,16 @@ function renderExerciseLog() {
         </div>
       </div>
       <div class="exercise-calories">${ex.cal} kcal</div>
-      <button class="btn btn-danger" onclick="deleteExercise(${ex.id})" style="padding:6px 12px;font-size:12px">삭제</button>
+      <button class="btn btn-danger btn-delete-ex" data-id="${ex.id}" style="padding:6px 12px;font-size:12px">삭제</button>
     </div>`).join('');
+
+  // 삭제 버튼 이벤트 리스너 연결
+  list.querySelectorAll('.btn-delete-ex').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.currentTarget.dataset.id;
+      deleteExercise(id);
+    });
+  });
 }
 
 function addExercise() {
@@ -297,11 +309,21 @@ function addExercise() {
 }
 
 function deleteExercise(id) {
-  const idx = EXERCISE_LOG.findIndex(e => e.id === id);
+  // id 타입 불일치 방지를 위해 무조건 String 변환 후 비교
+  const idx = EXERCISE_LOG.findIndex(e => String(e.id) === String(id));
   if(idx !== -1) {
     EXERCISE_LOG.splice(idx, 1);
     saveExerciseLog();     // 로컬 스토리지 업데이트
     renderExerciseLog();
+    
+    // 삭제 피드백
+    const msgEl = $('ex-msg');
+    if (msgEl) {
+      msgEl.style.display = 'block';
+      msgEl.style.color = 'var(--text-muted)';
+      msgEl.textContent = '🗑️ 운동 기록이 삭제되었습니다.';
+      setTimeout(() => msgEl.style.display = 'none', 2000);
+    }
   }
 }
 
