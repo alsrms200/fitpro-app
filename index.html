@@ -74,9 +74,9 @@
   </nav>
   <div class="sidebar-profile">
     <div class="profile-avatar" id="sidebar-avatar">U</div>
-    <div class="profile-info">
+    <div class="profile-info" style="flex:1">
       <p id="sidebar-username">Guest</p>
-      <span style="display:block;cursor:pointer;color:var(--accent-secondary);font-weight:600;margin-top:4px;" id="btn-logout">로그아웃</span>
+      <button id="btn-logout" style="margin-top:8px; background:transparent; border:1px solid var(--border); color:var(--text-muted); width:100%; border-radius:6px; padding:4px 0; font-size:11px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.color='var(--accent-secondary)'; this.style.borderColor='var(--accent-secondary)'" onmouseout="this.style.color='var(--text-muted)'; this.style.borderColor='var(--border)'">로그아웃</button>
     </div>
   </div>
 </div>

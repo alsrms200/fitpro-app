@@ -127,6 +127,43 @@ body {
   background: transparent; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; padding: 4px; margin-left: 12px;
 }
 .meal-record-del:hover { color: var(--accent-secondary); }
+
+/* ── Modal (Meal Add) ── */
+.modal {
+  display: none;
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.6);
+  z-index: 10000;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal.show { display: flex; }
+.modal-dialog {
+  background: var(--bg-card);
+  width: 100%; max-width: 420px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  padding: 24px;
+  animation: fadeUp 0.3s ease;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px; margin-bottom: 16px;
+}
+.modal-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.modal-body { padding: 10px 0; }
+.modal-footer { margin-top: 20px; }
+.form-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; display: block; }
+.form-control {
+  width: 100%; padding: 12px;
+  background: var(--bg-primary); border: 1px solid var(--border);
+  color: var(--text-primary); border-radius: 8px;
+  outline: none; transition: border 0.3s;
+}
+.form-control:focus { border-color: var(--accent-primary); }
 .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
 
 .sidebar-profile {
