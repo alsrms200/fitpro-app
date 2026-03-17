@@ -106,6 +106,45 @@ app.delete('/api/exercises/:id', verifyToken, async (req, res) => {
   }
 });
 
+// --- [ MEALS ROUTES (Protected) ] ---
+// API: 현재 로그인된 사용자의 섭취 식단 기록 가져오기
+app.get('/api/meals', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM meals WHERE user_id = ? ORDER BY date DESC, id DESC', [req.userId]);
+    res.json(rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: '식단 정보 로드 에러' });
+  }
+});
+
+// API: 새로운 식단 기록 추가하기
+app.post('/api/meals', verifyToken, async (req, res) => {
+  try {
+    const { id, date, type, name, cal } = req.body;
+    await pool.query(
+      'INSERT INTO meals (id, user_id, date, type, name, cal) VALUES (?, ?, ?, ?, ?, ?)',
+      [id, req.userId, date, type, name, cal]
+    );
+    res.json({ id, user_id: req.userId, date, type, name, cal });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: '식단 추가 실패' });
+  }
+});
+
+// API: 식단 기록 삭제하기
+app.delete('/api/meals/:id', verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM meals WHERE id = ? AND user_id = ?', [id, req.userId]);
+    res.json({ message: '식단 기록 삭제 완료' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: '식단 삭제 실패' });
+  }
+});
+
 // 서버 측 헬스체크
 app.get('/health', (req, res) => {
   res.status(200).send('OK');

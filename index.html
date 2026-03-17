@@ -319,8 +319,32 @@
     </div>
 
     <!-- 식단표 (3월 16일 월 ~ 3월 22일 일 / 오늘 = 화 3/17) -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;">
+      <h3 style="margin:0;">📅 가이드라인 및 섭취 기록</h3>
+      <button class="btn btn-primary" id="meal-add-btn" style="padding:8px 16px; font-size:13px; border-radius:30px;">
+        <span style="margin-right:4px;">+</span> 실제 식단 기록
+      </button>
+    </div>
+
+    <!-- 오늘 섭취 점검 바 (JS에서 업데이트 됨) -->
+    <div class="card" style="margin-top:0; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:13px; font-weight:600; color:var(--text-secondary)">오늘(화 3/17) 실제 섭취 칼로리</span>
+        <div style="text-align:right;">
+          <span style="font-size:20px; font-weight:800; color:var(--text-primary)" id="actual-cal-text">0</span>
+          <span style="font-size:12px; color:var(--text-muted)"> / 1900 kcal</span>
+        </div>
+      </div>
+      <div class="progress-bar" style="height:12px; border-radius:6px;">
+        <div class="progress-fill blue" id="actual-cal-bar" style="width:0%"></div>
+      </div>
+      
+      <!-- 오늘 입력한 실제 식단 리스트를 띄워줄 컨테이너 -->
+      <div id="actual-meals-list" style="margin-top: 16px;"></div>
+    </div>
+
     <div class="meal-grid-wrapper">
-    <div class="meal-grid-inner" id="meal-grid"></div>
+      <div class="meal-grid-inner" id="meal-grid"></div>
     </div><!-- /meal-grid-wrapper -->
 
     <!-- 식단 팁 -->
@@ -788,6 +812,42 @@
   <style>
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
+
+<!-- 식단입력 모달 -->
+<div class="modal fade" id="meal-modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">🍽️ 실제 섭취 식단 추가</h5>
+        <button type="button" class="btn-close" id="meal-modal-close" style="background:transparent; border:none; color:var(--text-secondary); font-size:24px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label" style="display:block; margin-bottom:6px; color:var(--text-secondary)">식사 유형</label>
+        <div class="type-selector" id="meal-type-selector">
+          <div class="type-btn active" data-type="아침">아침</div>
+          <div class="type-btn" data-type="점심">점심</div>
+          <div class="type-btn" data-type="저녁">저녁</div>
+          <div class="type-btn" data-type="간식">간식</div>
+        </div>
+        
+        <div style="margin-top:16px;">
+          <label class="form-label">음식명 / 메뉴</label>
+          <input type="text" class="form-control" id="meal-name" placeholder="예: 현미밥 한공기 통목살 구이" autocomplete="off" style="width:100%; padding:10px; background:var(--bg-primary); border:1px solid var(--border); color:var(--text-primary); border-radius:6px; margin-top:6px; margin-bottom:16px;">
+        </div>
+
+        <div>
+          <label class="form-label">섭취 칼로리 (kcal)</label>
+          <input type="number" class="form-control" id="meal-cal" placeholder="예: 450" autocomplete="off" style="width:100%; padding:10px; background:var(--bg-primary); border:1px solid var(--border); color:var(--text-primary); border-radius:6px; margin-top:6px;">
+        </div>
+        <div id="meal-modal-msg" style="margin-top:10px; font-size:13px; text-align:center;"></div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px;">
+        <button type="button" class="btn btn-primary" id="btn-save-meal" style="width:100%; padding:12px;">기록 저장하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <script src="app.js"></script>
 </body>
 </html>

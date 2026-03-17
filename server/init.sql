@@ -18,3 +18,14 @@ CREATE TABLE IF NOT EXISTS exercises (
     cal INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- 실제 섭취 식단 기록 테이블 생성
+CREATE TABLE IF NOT EXISTS meals (
+    id BIGINT PRIMARY KEY,
+    user_id INT NOT NULL,
+    date DATE NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    cal INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

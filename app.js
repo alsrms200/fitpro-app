@@ -89,6 +89,7 @@ function handleLogout() {
   localStorage.removeItem('fitpro_token');
   localStorage.removeItem('fitpro_user');
   EXERCISE_LOG = [];
+  MEAL_LOG = [];
   $('auth-overlay').style.display = 'flex';
 }
 
@@ -602,6 +603,173 @@ function initMobile() {
   });
 }
 
+// ── Meals Tracker ─────────────────────────────────────────────────
+let MEAL_LOG = [];
+
+async function loadMeals() {
+  if (!AUTH_TOKEN) return;
+  try {
+    const res = await fetch(`${API_BASE}/meals`, { headers: getAuthHeaders() });
+    if(res.ok) {
+      MEAL_LOG = await res.json();
+    }
+  } catch(e) {
+    console.error('식단 API 연결 실패:', e);
+  }
+  renderActualMeals();
+}
+
+function renderActualMeals() {
+  const listEl = $('actual-meals-list');
+  const calText = $('actual-cal-text');
+  const calBar = $('actual-cal-bar');
+  if(!listEl || !calText || !calBar) return;
+
+  // 오늘 날짜 데이터 필터링
+  const todayStr = '2026-03-17';
+  const todaysMeals = MEAL_LOG.filter(m => {
+    // DB에서 넘어오는 date format 처리 (T 등 제거)
+    return m.date.startsWith(todayStr); 
+  });
+
+  let totalCal = 0;
+  listEl.innerHTML = '';
+  
+  if(todaysMeals.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:10px; font-size:12px;">오늘 기록된 실제 섭취 식단이 없습니다.</div>';
+  } else {
+    todaysMeals.forEach(meal => {
+      totalCal += meal.cal;
+      const tBtn = document.createElement('div');
+      tBtn.className = 'meal-record-item';
+      
+      let typeColor = (meal.type === '아침') ? 'blue' : (meal.type === '점심') ? 'green' : (meal.type === '저녁') ? 'purple' : 'orange';
+      
+      tBtn.innerHTML = `
+        <div class="meal-record-info" style="display:flex; align-items:center;">
+          <span class="meal-record-type" style="background:var(--bg-secondary); color:var(--accent-${typeColor}); border: 1px solid var(--border)">${meal.type}</span>
+          <span class="meal-record-name">${meal.name}</span>
+        </div>
+        <div class="meal-record-cal">${meal.cal} <span style="font-size:11px; font-weight:400; color:var(--text-muted)">kcal</span></div>
+        <button class="meal-record-del" data-id="${meal.id}">×</button>
+      `;
+      listEl.appendChild(tBtn);
+    });
+  }
+
+  // 총합 및 게이지 업데이트
+  calText.textContent = totalCal.toLocaleString();
+  const pct = Math.min((totalCal / 1900) * 100, 100);
+  calBar.style.width = pct + '%';
+  
+  // 1900을 넘기면 빨간색으로 변경
+  if(totalCal > 1900) {
+    calBar.className = 'progress-fill red';
+    calText.style.color = 'var(--accent-secondary)';
+  } else {
+    calBar.className = 'progress-fill blue';
+    calText.style.color = 'var(--text-primary)';
+  }
+
+  // 삭제 이벤트 바인딩
+  document.querySelectorAll('.meal-record-del').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      if(confirm('이 기록을 삭제하시겠습니까?')) {
+        await deleteMeal(id);
+      }
+    });
+  });
+}
+
+async function addMeal(type, name, cal) {
+  const newMeal = {
+    id: Date.now(),
+    date: '2026-03-17',
+    type: type,
+    name: name,
+    cal: parseInt(cal) || 0
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/meals`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(newMeal)
+    });
+    if(res.ok) await loadMeals();
+  } catch(e) {
+    console.error('식단 저장 실패:', e);
+  }
+}
+
+async function deleteMeal(id) {
+  try {
+    const res = await fetch(`${API_BASE}/meals/${id}`, { 
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if(res.ok) await loadMeals();
+  } catch(e) {
+    console.error('식단 삭제 실패:', e);
+  }
+}
+
+function initMealModal() {
+  const modal = $('meal-modal');
+  const addBtn = $('meal-add-btn');
+  const closeBtn = $('meal-modal-close');
+  const saveBtn = $('btn-save-meal');
+  const typeBtns = document.querySelectorAll('#meal-type-selector .type-btn');
+  
+  if(!modal || !addBtn) return;
+
+  addBtn.addEventListener('click', () => {
+    $('meal-name').value = '';
+    $('meal-cal').value = '';
+    $('meal-modal-msg').textContent = '';
+    modal.classList.add('show');
+    modal.style.display = 'block';
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('show');
+    setTimeout(() => modal.style.display = 'none', 300);
+  });
+
+  typeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      typeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  saveBtn.addEventListener('click', async () => {
+    const activeType = document.querySelector('#meal-type-selector .type-btn.active').dataset.type;
+    const name = $('meal-name').value.trim();
+    const cal = $('meal-cal').value.trim();
+    const msg = $('meal-modal-msg');
+
+    if(!name || !cal) {
+      msg.style.color = 'var(--accent-secondary)';
+      msg.textContent = '❌ 메뉴명과 칼로리를 모두 입력해주세요.';
+      setTimeout(() => msg.textContent = '', 3000);
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = '저장 중...';
+    await addMeal(activeType, name, cal);
+    
+    saveBtn.textContent = '기록 저장하기';
+    saveBtn.disabled = false;
+    
+    modal.classList.remove('show');
+    setTimeout(() => modal.style.display = 'none', 300);
+  });
+}
+
 // ── Auth ──────────────────────────────────────────────────────────
 function initAuth() {
   const overlay = $('auth-overlay');
@@ -614,6 +782,7 @@ function initAuth() {
     if (avatar) avatar.textContent = AUTH_USER.charAt(0).toUpperCase();
     if (uname) uname.textContent = AUTH_USER;
     loadExercises();
+    loadMeals();
   } else {
     overlay.style.display = 'flex';
   }
@@ -664,6 +833,7 @@ function initAuth() {
       setTimeout(() => {
         overlay.style.display = 'none';
         loadExercises(); // 데이터 연동
+        loadMeals();
       }, 500);
 
     } catch(e) {
@@ -700,6 +870,7 @@ function initAuth() {
 // ── Init ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initAuth();
+  initMealModal();
   initNav();
   initMobile();
   initTabs();
@@ -714,7 +885,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDashboard();
   renderMealPlan(1); // 기본은 3월 3주차 (인덱스 1)
   // 초기 운동 기록 통계 보충
-  if(AUTH_TOKEN) renderExerciseLog(); 
+  if(AUTH_TOKEN) {
+    renderExerciseLog(); 
+    loadMeals();
+  }
   renderGoals();
   renderRunning();
 
