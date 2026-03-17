@@ -70,8 +70,8 @@
     <div class="nav-section-title">분석</div>
     <div class="nav-item" data-page="goals"><span class="nav-icon">🎯</span> 목표 & 분석</div>
 
-    <div class="nav-section-title">연동</div>
-    <div class="nav-item" data-page="calendar"><span class="nav-icon">📅</span> 구글 캘린더</div>
+    <div class="nav-section-title">설정</div>
+    <div class="nav-item" data-page="profile"><span class="nav-icon">⚙️</span> 프로필 설정</div>
   </nav>
   <div class="sidebar-profile">
     <div class="profile-avatar" id="sidebar-avatar">U</div>
@@ -106,8 +106,8 @@
   <button class="bottom-nav-item" data-page="goals">
     <span class="bnav-icon">🎯</span>목표
   </button>
-  <button class="bottom-nav-item" data-page="calendar">
-    <span class="bnav-icon">📅</span>캘린더
+  <button class="bottom-nav-item" data-page="profile">
+    <span class="bnav-icon">⚙️</span>설정
   </button>
 </nav>
 
@@ -680,134 +680,88 @@
     </div>
   </div>
 
-  <!-- ━━━━━━━━━━ GOOGLE CALENDAR ━━━━━━━━━━ -->
-  <div class="page" id="page-calendar">
+  <!-- ━━━━━━━━━━ PROFILE SETTINGS ━━━━━━━━━━ -->
+  <div class="page" id="page-profile">
     <div class="page-header">
-      <h1>구글 캘린더 📅</h1>
-      <p>Google Calendar 연동으로 일정과 운동 스케줄을 한번에 관리</p>
+      <h1>프로필 설정 ⚙️</h1>
+      <p>계정 정보 및 신체 스펙을 관리하세요</p>
     </div>
 
-    <!-- 로그인 전 안내 -->
-    <div id="gcal-login-section">
-      <div class="card" style="text-align:center;padding:40px 24px">
-        <div style="font-size:64px;margin-bottom:16px">📅</div>
-        <h2 style="font-size:22px;font-weight:800;margin-bottom:8px">구글 캘린더 연동</h2>
-        <p style="color:var(--text-muted);margin-bottom:24px;line-height:1.7">Google 계정으로 로그인하면 캘린더 일정을 가져오고<br>운동 스케줄을 자동으로 추가할 수 있습니다.</p>
-        <button id="gcal-signin-btn" class="btn btn-primary" style="font-size:15px;padding:14px 32px">
-          🔐 Google로 로그인
-        </button>
-        <div style="margin-top:20px;padding:14px;background:rgba(108,99,255,0.08);border-radius:12px;font-size:12px;color:var(--text-muted);text-align:left">
-          <strong style="color:var(--text-primary)">⚙️ 설정 필요</strong><br>
-          Google Cloud Console에서 <strong>Client ID</strong>를 발급받아<br>
-          아래 설정 영역에 입력해야 연동이 가능합니다.
-          <br><br>
-          <span style="color:var(--accent-green)">✓</span> 읽기: 오늘 일정 조회<br>
-          <span style="color:var(--accent-green)">✓</span> 쓰기: 운동 일정 추가
+    <div class="grid-2">
+      <!-- 계정 관리 -->
+      <div class="card">
+        <div class="card-title">🔐 계정 관리</div>
+        <div style="margin-top:12px; display:flex; flex-direction:column; gap:16px;">
+          <div class="form-group">
+            <label>사용자 아이디</label>
+            <input type="text" id="prof-username" readonly style="background:rgba(255,255,255,0.03); color:var(--text-muted); cursor:not-allowed">
+          </div>
+          <div class="form-group">
+            <label>새 비밀번호 (변경 시에만 입력)</label>
+            <input type="password" id="prof-password" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>새 비밀번호 확인</label>
+            <input type="password" id="prof-password-confirm" placeholder="••••••••">
+          </div>
         </div>
       </div>
 
-      <!-- Client ID 설정 -->
-      <div class="card" style="margin-top:16px">
-        <div class="card-title">⚙️ Google API 설정</div>
-        <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px">
+      <!-- 신체 스펙 -->
+      <div class="card">
+        <div class="card-title">⚖️ 신체 스펙</div>
+        <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div class="form-group">
-            <label>Google Client ID</label>
-            <input type="text" id="gcal-client-id" placeholder="xxxx.apps.googleusercontent.com" style="font-size:13px">
+            <label>나이 (세)</label>
+            <input type="number" id="prof-age" placeholder="39">
           </div>
-          <button class="btn btn-primary" id="gcal-init-btn" style="width:fit-content">🔗 연결 초기화</button>
-          <div style="font-size:12px;color:var(--text-muted);line-height:1.8">
-            📖 발급 방법: <a href="https://console.cloud.google.com" target="_blank" style="color:var(--accent-primary)">Google Cloud Console</a> → 사용자 인증 정보 → OAuth 2.0 클라이언트 ID 생성<br>
-            → 승인된 JavaScript 원본: <code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px">http://localhost:9001</code>
+          <div class="form-group">
+            <label>키 (cm)</label>
+            <input type="number" id="prof-height" placeholder="185" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>몸무게 (kg)</label>
+            <input type="number" id="prof-weight" placeholder="88" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>골격근량 (kg)</label>
+            <input type="number" id="prof-muscle" placeholder="38.6" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>체지방률 (%)</label>
+            <input type="number" id="prof-fat-pct" placeholder="22.9" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>기초대사량 (kcal)</label>
+            <input type="number" id="prof-bmr" placeholder="1835">
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 로그인 후 캘린더 뷰 -->
-    <div id="gcal-main-section" style="display:none">
-      <!-- 사용자 프로필 -->
-      <div class="card" style="display:flex;align-items:center;gap:16px;padding:16px 20px">
-        <img id="gcal-user-avatar" src="" width="44" height="44" style="border-radius:50%;background:#333" alt="">
-        <div>
-          <div id="gcal-user-name" style="font-weight:700"></div>
-          <div id="gcal-user-email" style="font-size:12px;color:var(--text-muted)"></div>
+    <!-- 목표 설정 -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">🎯 목표 설정</div>
+      <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="form-group">
+          <label>일일 목표 섭취 칼로리 (kcal)</label>
+          <input type="number" id="prof-target-cal" placeholder="1900">
         </div>
-        <button id="gcal-signout-btn" class="btn" style="margin-left:auto;background:rgba(255,255,255,0.06);border:1px solid var(--border);font-size:12px;padding:6px 14px">로그아웃</button>
-      </div>
-
-      <!-- 오늘 일정 -->
-      <div class="card" style="margin-top:16px">
-        <div class="card-title">📋 오늘 일정 (2026년 3월 17일 화)</div>
-        <div id="gcal-events-list" style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-          <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">일정을 불러오는 중...</div>
+        <div class="form-group">
+          <label>체지방 감량 목표량 (kg, 예: -8.2)</label>
+          <input type="number" id="prof-fat-target" placeholder="-8.2" step="0.1">
         </div>
-        <button id="gcal-refresh-btn" class="btn" style="margin-top:12px;background:rgba(108,99,255,0.12);border:1px solid rgba(108,99,255,0.3);font-size:13px;padding:8px 16px">🔄 새로고침</button>
-      </div>
-
-      <!-- 운동 일정 추가 -->
-      <div class="card" style="margin-top:16px">
-        <div class="card-title">➕ 운동 일정 캘린더에 추가</div>
-        <div class="form-row" style="margin-top:12px">
-          <div class="form-group">
-            <label>운동 종목</label>
-            <input type="text" id="gcal-event-title" placeholder="예: 하프마라톤 러닝">
-          </div>
-          <div class="form-group">
-            <label>날짜</label>
-            <input type="date" id="gcal-event-date">
-          </div>
-          <div class="form-group">
-            <label>시작 시간</label>
-            <input type="time" id="gcal-event-start" value="07:00">
-          </div>
-          <div class="form-group">
-            <label>종료 시간</label>
-            <input type="time" id="gcal-event-end" value="08:00">
-          </div>
-        </div>
-        <button id="gcal-add-event-btn" class="btn btn-primary" style="margin-top:8px">📅 캘린더에 추가</button>
-        <div id="gcal-add-result" style="margin-top:10px;font-size:13px;display:none"></div>
-      </div>
-
-      <!-- 이번 주 운동 일정 바로 추가 -->
-      <div class="card" style="margin-top:16px">
-        <div class="card-title">⚡ 이번 주 운동 스케줄 일괄 추가</div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">
-          <button class="btn gcal-quick-btn" data-title="러닝 5km" data-date="2026-03-18" data-start="07:00" data-end="08:00"
-            style="background:rgba(67,233,123,0.08);border:1px solid rgba(67,233,123,0.25);padding:12px;text-align:left;border-radius:12px">
-            <div style="font-size:11px;color:var(--text-muted)">수 3/18</div>
-            <div style="font-weight:700">🏃 러닝 5km</div>
-            <div style="font-size:11px;color:var(--text-muted)">07:00 – 08:00</div>
-          </button>
-          <button class="btn gcal-quick-btn" data-title="웨이트 트레이닝" data-date="2026-03-19" data-start="10:00" data-end="11:30"
-            style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.25);padding:12px;text-align:left;border-radius:12px">
-            <div style="font-size:11px;color:var(--text-muted)">목 3/19</div>
-            <div style="font-weight:700">🏋️ 웨이트 트레이닝</div>
-            <div style="font-size:11px;color:var(--text-muted)">10:00 – 11:30</div>
-          </button>
-          <button class="btn gcal-quick-btn" data-title="장거리 러닝 10km" data-date="2026-03-20" data-start="07:00" data-end="08:30"
-            style="background:rgba(67,233,123,0.08);border:1px solid rgba(67,233,123,0.25);padding:12px;text-align:left;border-radius:12px">
-            <div style="font-size:11px;color:var(--text-muted)">금 3/20</div>
-            <div style="font-weight:700">🏃 장거리 러닝 10km</div>
-            <div style="font-size:11px;color:var(--text-muted)">07:00 – 08:30</div>
-          </button>
-          <button class="btn gcal-quick-btn" data-title="웨이트 트레이닝" data-date="2026-03-21" data-start="19:00" data-end="20:30"
-            style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.25);padding:12px;text-align:left;border-radius:12px">
-            <div style="font-size:11px;color:var(--text-muted)">토 3/21</div>
-            <div style="font-weight:700">🏋️ 웨이트 트레이닝</div>
-            <div style="font-size:11px;color:var(--text-muted)">19:00 – 20:30</div>
-          </button>
-        </div>
-        <div id="gcal-quick-result" style="margin-top:10px;font-size:13px;display:none"></div>
       </div>
     </div>
+
+    <div style="margin-top:24px; display:flex; gap:12px; justify-content:flex-end;">
+      <button class="btn btn-primary" id="btn-save-profile" style="padding:14px 40px; font-size:16px">💾 설정 저장하기</button>
+    </div>
+    <div id="prof-msg" style="margin-top:16px; text-align:center; font-size:14px; display:none"></div>
   </div>
 
 </div><!-- /main-content -->
 
-<!-- Google API -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://apis.google.com/js/api.js" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <!-- Global Styles (Animation for loader) -->
   <style>

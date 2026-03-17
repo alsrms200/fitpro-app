@@ -8,7 +8,18 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_fitpro_key';
 
-app.use(cors());
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Bypass-Tunnel-Reminder');
+  
+  // OPTIONS 요청(Preflight) 즉시 응답
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 app.use(express.json());
 
 // 미들웨어: JWT 토큰 검증
@@ -61,6 +72,44 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: '로그인 실패' });
+  }
+});
+
+// --- [ PROFILE ROUTES (Protected) ] ---
+// API: 유저 프로필 조회
+app.get('/api/user/profile', verifyToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT username, age, height, weight, muscle, fat_pct, bmr, target_cal, fat_target FROM users WHERE id = ?', [req.userId]);
+    if(rows.length === 0) return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: '프로필 조회 실패' });
+  }
+});
+
+// API: 유저 프로필 업데이트
+app.post('/api/user/profile', verifyToken, async (req, res) => {
+  try {
+    const { password, age, height, weight, muscle, fat_pct, bmr, target_cal, fat_target } = req.body;
+    
+    // 1. 기본 프로필 정보 업데이트
+    let query = 'UPDATE users SET age = ?, height = ?, weight = ?, muscle = ?, fat_pct = ?, bmr = ?, target_cal = ?, fat_target = ? WHERE id = ?';
+    let params = [age, height, weight, muscle, fat_pct, bmr, target_cal, fat_target, req.userId];
+    
+    await pool.query(query, params);
+
+    // 2. 비밀번호도 있다면 암호화해서 업데이트
+    if (password && password.trim() !== "") {
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(password, salt);
+      await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [hash, req.userId]);
+    }
+
+    res.json({ message: '프로필이 성공적으로 업데이트되었습니다.' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: '프로필 업데이트 실패' });
   }
 });
 

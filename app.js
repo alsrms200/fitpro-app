@@ -1,10 +1,9 @@
-// ── Data ──────────────────────────────────────────────────────────────
-const USER = {
-  name: '제이슨', age: 39, height: 185, weight: 88,
-  muscle: 38.6, fat: 20.2, fatPct: 22.9, bmi: 25.7,
-  bmr: 1835, targetCal: 1900, whr: 0.84,
-  fatTarget: -8.2, fitnessScore: 76,
-  bodyWater: 49.5, protein: 13.5, mineral: 4.83,
+let USER = {
+  name: '사용자', age: 30, height: 175, weight: 70,
+  muscle: 30, fat: 14, fatPct: 20, bmi: 22.8,
+  bmr: 1600, targetCal: 2000, whr: 0.85,
+  fatTarget: -5.0, fitnessScore: 70,
+  bodyWater: 40, protein: 12, mineral: 4,
 };
 
 // 주차별 데이터 (0: 3/9~3/15, 1: 3/16~3/22, 2: 3/23~3/29)
@@ -50,14 +49,25 @@ const DEFAULT_EXERCISE_LOG = [
 
 // 인증 및 API 상태
 let EXERCISE_LOG = [];
-const API_BASE = 'http://localhost:5000/api';
+
+// [추가] URL 파라미터로 API 주소를 설정할 수 있게 함 (모바일 편의성)
+const urlParams = new URLSearchParams(window.location.search);
+const setApi = urlParams.get('set_api');
+if (setApi) {
+  localStorage.setItem('fitpro_api_url', setApi);
+  // 파라미터 제거 후 깔끔한 URL로 이동
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+const API_BASE = localStorage.getItem('fitpro_api_url') || 'http://localhost:5000/api';
 let AUTH_TOKEN = localStorage.getItem('fitpro_token');
 let AUTH_USER = localStorage.getItem('fitpro_user');
 
 function getAuthHeaders() {
   return {
     'Content-Type': 'application/json',
-    'Authorization': AUTH_TOKEN ? `Bearer ${AUTH_TOKEN}` : ''
+    'Authorization': AUTH_TOKEN ? `Bearer ${AUTH_TOKEN}` : '',
+    'Bypass-Tunnel-Reminder': 'true'
   };
 }
 
@@ -90,6 +100,12 @@ function handleLogout() {
   localStorage.removeItem('fitpro_user');
   EXERCISE_LOG = [];
   MEAL_LOG = [];
+  
+  const avatar = $('sidebar-avatar');
+  const uname = $('sidebar-username');
+  if (avatar) avatar.textContent = 'U';
+  if (uname) uname.textContent = 'Guest';
+  
   $('auth-overlay').style.display = 'flex';
 }
 
@@ -156,6 +172,9 @@ function switchPage(page) {
   document.querySelectorAll('.page').forEach(p => {
     p.classList.toggle('active', p.id === `page-${page}`);
   });
+  // 페이지별 초기화 로직
+  if (page === 'profile') loadProfile();
+  
   // 맨 위로 스크롤
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -603,6 +622,109 @@ function initMobile() {
   });
 }
 
+// ── Profile Management ────────────────────────────────────────────
+async function loadProfile() {
+  if (!AUTH_TOKEN) return;
+  try {
+    const res = await fetch(`${API_BASE}/user/profile`, { headers: getAuthHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      
+      // 전역 USER 객체 업데이트 (대시보드 반영용)
+      USER.name = data.username;
+      USER.age = data.age;
+      USER.height = data.height;
+      USER.weight = data.weight;
+      USER.muscle = data.muscle;
+      USER.fatPct = data.fat_pct;
+      USER.bmr = data.bmr;
+      USER.targetCal = data.target_cal;
+      USER.fatTarget = data.fat_target;
+      
+      // 파생 데이터 계산 (간단화)
+      USER.fat = (USER.weight * USER.fatPct / 100);
+      USER.bmi = (USER.weight / ((USER.height/100) * (USER.height/100)));
+      USER.bodyWater = USER.weight * 0.6; 
+      USER.protein = USER.weight * 0.15;
+
+      // 프로필 설정 화면 UI 업데이트
+      if ($('prof-username')) {
+        $('prof-username').value = data.username;
+        $('prof-age').value = data.age;
+        $('prof-height').value = data.height;
+        $('prof-weight').value = data.weight;
+        $('prof-muscle').value = data.muscle;
+        $('prof-fat-pct').value = data.fat_pct;
+        $('prof-bmr').value = data.bmr;
+        $('prof-target-cal').value = data.target_cal;
+        $('prof-fat-target').value = data.fat_target;
+      }
+
+      // 대시보드 및 지표 갱신
+      renderDashboard();
+      renderGoals();
+    }
+  } catch (e) {
+    console.error('프로필 로드 실패:', e);
+  }
+}
+
+async function saveProfile() {
+  const password = $('prof-password').value;
+  const confirm = $('prof-password-confirm').value;
+  const msgEl = $('prof-msg');
+
+  if (password && password !== confirm) {
+    msgEl.style.display = 'block';
+    msgEl.style.color = 'var(--accent-secondary)';
+    msgEl.textContent = '❌ 비밀번호 확인이 일치하지 않습니다.';
+    return;
+  }
+
+  const profileData = {
+    password: password,
+    age: parseInt($('prof-age').value) || USER.age,
+    height: parseFloat($('prof-height').value) || USER.height,
+    weight: parseFloat($('prof-weight').value) || USER.weight,
+    muscle: parseFloat($('prof-muscle').value) || USER.muscle,
+    fat_pct: parseFloat($('prof-fat-pct').value) || USER.fatPct,
+    bmr: parseInt($('prof-bmr').value) || USER.bmr,
+    target_cal: parseInt($('prof-target-cal').value) || USER.targetCal,
+    fat_target: parseFloat($('prof-fat-target').value) || USER.fatTarget
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/user/profile`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(profileData)
+    });
+
+    if (res.ok) {
+      msgEl.style.display = 'block';
+      msgEl.style.color = 'var(--accent-green)';
+      msgEl.textContent = '✅ 프로필 정보가 데이터베이스에 성공적으로 업데이트되었습니다.';
+      
+      // 비밀번호 필드 초기화
+      $('prof-password').value = '';
+      $('prof-password-confirm').value = '';
+      
+      // 최신 정보 다시 로드
+      await loadProfile();
+      
+      setTimeout(() => msgEl.style.display = 'none', 3000);
+    } else {
+      const errData = await res.json();
+      throw new Error(errData.error || 'Update failed');
+    }
+  } catch (e) {
+    console.error('프로필 저장 실패:', e);
+    msgEl.style.display = 'block';
+    msgEl.style.color = 'var(--accent-secondary)';
+    msgEl.textContent = `❌ 저장 실패: ${e.message}`;
+  }
+}
+
 // ── Meals Tracker ─────────────────────────────────────────────────
 let MEAL_LOG = [];
 
@@ -783,6 +905,7 @@ function initAuth() {
     if (uname) uname.textContent = AUTH_USER;
     loadExercises();
     loadMeals();
+    loadProfile();
   } else {
     overlay.style.display = 'flex';
   }
@@ -810,7 +933,10 @@ function initAuth() {
     try {
       const resp = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Bypass-Tunnel-Reminder': 'true'
+        },
         body: JSON.stringify(data)
       });
       const result = await resp.json();
@@ -834,6 +960,7 @@ function initAuth() {
         overlay.style.display = 'none';
         loadExercises(); // 데이터 연동
         loadMeals();
+        loadProfile();
       }, 500);
 
     } catch(e) {
@@ -912,210 +1039,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const addBtn = $('btn-add-exercise');
   if(addBtn) addBtn.addEventListener('click', addExercise);
 
+  // 프로필 저장 버튼
+  const saveProfBtn = $('btn-save-profile');
+  if(saveProfBtn) saveProfBtn.addEventListener('click', saveProfile);
+
   // 러닝 OCR 초기화
   initOCR();
-
-  // 구글 캘린더 초기화
-  initGoogleCalendar();
 });
 
-// ── Google Calendar 연동 ──────────────────────────────────────────
-const GCAL = {
-  clientId: '',
-  tokenClient: null,
-  accessToken: null,
-  SCOPES: 'https://www.googleapis.com/auth/calendar',
-  TODAY: '2026-03-17',
-};
-
-function initGoogleCalendar() {
-  const initBtn = $('gcal-init-btn');
-  const signinBtn = $('gcal-signin-btn');
-  const signoutBtn = $('gcal-signout-btn');
-  const refreshBtn = $('gcal-refresh-btn');
-  const addEventBtn = $('gcal-add-event-btn');
-
-  if(initBtn) initBtn.addEventListener('click', gcalInit);
-  if(signinBtn) signinBtn.addEventListener('click', gcalSignIn);
-  if(signoutBtn) signoutBtn.addEventListener('click', gcalSignOut);
-  if(refreshBtn) refreshBtn.addEventListener('click', gcalLoadEvents);
-  if(addEventBtn) addEventBtn.addEventListener('click', gcalAddEvent);
-
-  // 빠른 추가 버튼
-  document.querySelectorAll('.gcal-quick-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      gcalAddQuickEvent(btn.dataset.title, btn.dataset.date, btn.dataset.start, btn.dataset.end);
-    });
-  });
-
-  // 저장된 Client ID 복원
-  const saved = localStorage.getItem('gcal_client_id');
-  if(saved) {
-    const el = $('gcal-client-id');
-    if(el) el.value = saved;
-  }
-}
-
-function gcalInit() {
-  const idInput = $('gcal-client-id');
-  const clientId = idInput ? idInput.value.trim() : '';
-  if(!clientId) {
-    showGcalMsg('gcal-add-result', '❌ Client ID를 먼저 입력해주세요.', 'error');
-    return;
-  }
-  GCAL.clientId = clientId;
-  localStorage.setItem('gcal_client_id', clientId);
-
-  // google.accounts.oauth2 로드 체크
-  if(typeof google === 'undefined' || !google.accounts) {
-    showGcalMsg('gcal-add-result', '⏳ Google API 로딩 중... 잠시 후 다시 시도하세요.', 'warn');
-    return;
-  }
-
-  GCAL.tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GCAL.clientId,
-    scope: GCAL.SCOPES,
-    callback: (resp) => {
-      if(resp.error) { showGcalMsg('gcal-add-result', '❌ 로그인 실패: ' + resp.error, 'error'); return; }
-      GCAL.accessToken = resp.access_token;
-      gcalOnSignedIn();
-    },
-  });
-
-  const btn = $('gcal-init-btn');
-  if(btn) { btn.textContent = '✅ 초기화 완료 – 로그인 버튼 클릭!'; btn.disabled = true; }
-}
-
-function gcalSignIn() {
-  if(!GCAL.tokenClient) {
-    // Client ID가 저장되어 있으면 자동 초기화
-    const saved = localStorage.getItem('gcal_client_id');
-    if(saved) { $('gcal-client-id').value = saved; gcalInit(); }
-    else { alert('먼저 ⚙️ Google API 설정에서 Client ID를 입력하고 [연결 초기화]를 눌러주세요.'); return; }
-  }
-  if(GCAL.tokenClient) GCAL.tokenClient.requestAccessToken({ prompt: '' });
-}
-
-function gcalSignOut() {
-  if(GCAL.accessToken) {
-    google.accounts.oauth2.revoke(GCAL.accessToken, () => {});
-    GCAL.accessToken = null;
-  }
-  const loginSec = $('gcal-login-section');
-  const mainSec = $('gcal-main-section');
-  if(loginSec) loginSec.style.display = '';
-  if(mainSec) mainSec.style.display = 'none';
-}
-
-function gcalOnSignedIn() {
-  // gapi 로드 후 사용자 정보 조회
-  gapi.load('client', async () => {
-    await gapi.client.init({ apiKey: '', discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'] });
-    gapi.client.setToken({ access_token: GCAL.accessToken });
-
-    // 사용자 프로필 (tokeninfo)
-    try {
-      const info = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
-        headers: { Authorization: `Bearer ${GCAL.accessToken}` }
-      }).then(r => r.json());
-      const nameEl = $('gcal-user-name');
-      const emailEl = $('gcal-user-email');
-      const avatarEl = $('gcal-user-avatar');
-      if(nameEl) nameEl.textContent = info.name || '사용자';
-      if(emailEl) emailEl.textContent = info.email || '';
-      if(avatarEl && info.picture) avatarEl.src = info.picture;
-    } catch(e) {}
-
-    const loginSec = $('gcal-login-section');
-    const mainSec = $('gcal-main-section');
-    if(loginSec) loginSec.style.display = 'none';
-    if(mainSec) mainSec.style.display = '';
-
-    gcalLoadEvents();
-  });
-}
-
-async function gcalLoadEvents() {
-  const listEl = $('gcal-events-list');
-  if(!listEl) return;
-  listEl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">🔄 불러오는 중...</div>';
-
-  try {
-    const date = GCAL.TODAY;
-    const start = new Date(date + 'T00:00:00+09:00').toISOString();
-    const end   = new Date(date + 'T23:59:59+09:00').toISOString();
-
-    const resp = await gapi.client.calendar.events.list({
-      calendarId: 'primary',
-      timeMin: start, timeMax: end,
-      singleEvents: true, orderBy: 'startTime',
-      maxResults: 20,
-    });
-    const events = resp.result.items || [];
-    if(events.length === 0) {
-      listEl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">오늘 등록된 일정이 없습니다.</div>';
-      return;
-    }
-    listEl.innerHTML = events.map(ev => {
-      const start = ev.start.dateTime ? ev.start.dateTime.slice(11,16) : '종일';
-      const end   = ev.end.dateTime   ? ev.end.dateTime.slice(11,16)   : '';
-      const time  = start + (end ? ` – ${end}` : '');
-      const color = ev.colorId ? `hsl(${ev.colorId * 30},60%,55%)` : 'var(--accent-primary)';
-      return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;border-left:3px solid ${color}">
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:13px">${ev.summary || '(제목 없음)'}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${time}${ev.location ? ' · ' + ev.location : ''}</div>
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    listEl.innerHTML = `<div style="color:var(--accent-secondary);font-size:13px;text-align:center;padding:20px">❌ 일정 불러오기 실패: ${e.message || e}</div>`;
-  }
-}
-
-async function gcalAddEvent() {
-  const title = ($('gcal-event-title') || {}).value?.trim();
-  const date  = ($('gcal-event-date')  || {}).value;
-  const start = ($('gcal-event-start') || {}).value;
-  const end   = ($('gcal-event-end')   || {}).value;
-  if(!title || !date || !start || !end) {
-    showGcalMsg('gcal-add-result', '❌ 모든 항목을 입력해주세요.', 'error');
-    return;
-  }
-  await gcalCreateEvent(title, date, start, end, 'gcal-add-result');
-}
-
-async function gcalAddQuickEvent(title, date, start, end) {
-  await gcalCreateEvent(title, date, start, end, 'gcal-quick-result');
-}
-
-async function gcalCreateEvent(title, date, start, end, resultFieldId) {
-  if(!GCAL.accessToken) {
-    showGcalMsg(resultFieldId, '❌ 먼저 로그인해주세요.', 'error'); return;
-  }
-  showGcalMsg(resultFieldId, '⏳ 추가 중...', 'warn');
-  try {
-    const event = {
-      summary: `[FitPro] ${title}`,
-      description: 'FitPro 피트니스 관리 앱에서 추가된 운동 일정',
-      start: { dateTime: `${date}T${start}:00+09:00`, timeZone: 'Asia/Seoul' },
-      end:   { dateTime: `${date}T${end}:00+09:00`,   timeZone: 'Asia/Seoul' },
-      colorId: '2', // Sage green
-    };
-    const resp = await gapi.client.calendar.events.insert({ calendarId: 'primary', resource: event });
-    const link = resp.result.htmlLink;
-    showGcalMsg(resultFieldId, `✅ "${title}" 추가 완료! <a href="${link}" target="_blank" style="color:var(--accent-primary)">캘린더에서 보기</a>`, 'success');
-    gcalLoadEvents();
-  } catch(e) {
-    showGcalMsg(resultFieldId, `❌ 추가 실패: ${e.result?.error?.message || e.message}`, 'error');
-  }
-}
-
-function showGcalMsg(fieldId, msg, type) {
-  const el = $(fieldId);
-  if(!el) return;
-  const colors = { success: 'var(--accent-green)', error: 'var(--accent-secondary)', warn: 'var(--accent-orange)' };
-  el.style.display = '';
-  el.style.color = colors[type] || 'inherit';
-  el.innerHTML = msg;
-}
