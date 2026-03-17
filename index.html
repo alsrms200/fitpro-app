@@ -231,9 +231,18 @@
 
   <!-- ━━━━━━━━━━ MEAL PLAN ━━━━━━━━━━ -->
   <div class="page" id="page-meal">
-    <div class="page-header">
-      <h1>식단 계획 🍱</h1>
-      <p>2026년 3월 3주차 · 체지방 감량 맞춤 식단 (1,900 kcal/일)</p>
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+      <div>
+        <h1>식단 계획 🍱</h1>
+        <p id="meal-plan-desc">2026년 3월 3주차 · 체지방 감량 맞춤 식단 (1,900 kcal/일)</p>
+      </div>
+      <div style="margin-top: 10px;">
+        <select id="week-selector" class="form-group" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-size: 14px;">
+          <option value="0">3월 2주차 (3/9 ~ 3/15)</option>
+          <option value="1" selected>3월 3주차 (3/16 ~ 3/22)</option>
+          <option value="2">3월 4주차 (3/23 ~ 3/29)</option>
+        </select>
+      </div>
     </div>
 
     <!-- 칼로리 가이드 -->
@@ -437,6 +446,38 @@
         <div class="record-value" style="color:var(--accent-orange)">1,150</div>
         <div class="record-label">소모 칼로리 (kcal)</div>
         <div class="record-date">88kg 기준 추산</div>
+      </div>
+    </div>
+
+    <!-- 📸 러닝 스크린샷 OCR 등록 (신규 추가) -->
+    <div class="card" style="margin-bottom:20px; text-align:center;">
+      <div class="card-title">📸 스크린샷으로 운동 기록 자동 추가</div>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px">나이키 런 클럽(NRC), 스트라바, 애플워치 등의 러닝 결과 스크린샷을 올리면 거리와 시간을 자동으로 인식합니다.</p>
+      
+      <div style="padding:20px; border:2px dashed var(--border); border-radius:12px; background:var(--bg-body); position:relative; overflow:hidden;">
+        <input type="file" id="ocr-upload" accept="image/*" style="opacity:0; position:absolute; top:0; left:0; width:100%; height:100%; cursor:pointer; z-index:10;">
+        <div style="font-size:32px; margin-bottom:10px;">📤</div>
+        <div style="font-weight:700; color:var(--text-primary);">이미지 업로드 (터치)</div>
+      </div>
+
+      <!-- OCR 진행 상태 표시 -->
+      <div id="ocr-status" style="display:none; margin-top:16px; padding:12px; background:rgba(79,172,254,0.1); border-radius:8px;">
+        <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <div class="loader" style="width:16px; height:16px; border:2px solid var(--accent-blue); border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite;"></div>
+          <span id="ocr-msg" style="font-size:13px; font-weight:600; color:var(--accent-blue);">이미지 분석 중... 잠시만 기다려주세요 (0%)</span>
+        </div>
+      </div>
+
+      <!-- 추출 결과 표시 -->
+      <div id="ocr-result" style="display:none; margin-top:16px; padding:16px; background:rgba(67,233,123,0.1); border-radius:8px; border:1px solid rgba(67,233,123,0.3); text-align:left;">
+        <div style="font-weight:bold; margin-bottom:12px; color:var(--accent-green);">✨ 자동 추출 성공!</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:14px; margin-bottom:16px;">
+          <div><span style="color:var(--text-muted)">종목: </span> <strong id="ocr-res-type">러닝</strong></div>
+          <div><span style="color:var(--text-muted)">날짜: </span> <strong id="ocr-res-date"></strong></div>
+          <div><span style="color:var(--text-muted)">거리: </span> <strong id="ocr-res-distance"></strong></div>
+          <div><span style="color:var(--text-muted)">시간: </span> <strong id="ocr-res-duration"></strong></div>
+        </div>
+        <button id="btn-ocr-save" class="btn btn-primary" style="width:100%">운동 기록에 즉시 저장</button>
       </div>
     </div>
 
@@ -702,6 +743,11 @@
 <!-- Google API -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
-<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- Global Styles (Animation for loader) -->
+  <style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+  <script src="app.js"></script>
 </body>
 </html>

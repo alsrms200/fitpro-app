@@ -7,62 +7,59 @@ const USER = {
   bodyWater: 49.5, protein: 13.5, mineral: 4.83,
 };
 
-// 3월 17일(화) 포함 주간 (16~22일)
-const WEEK_MEALS = [
-  { day:'월', date: 16, meals: {
-    breakfast: { name: '귀리밥 + 달걀 2개 + 그릭요거트', cal: 420 },
-    lunch:     { name: '닭가슴살 샐러드 + 현미밥 + 미역국', cal: 540 },
-    dinner:    { name: '연어구이 + 브로콜리 + 고구마', cal: 480 },
-    snack:     { name: '바나나 1개 + 아몬드 10알', cal: 180 },
-  }},
-  { day:'화', date: 17, meals: {
-    breakfast: { name: '통밀빵 + 아보카도 + 삶은달걀', cal: 410 },
-    lunch:     { name: '소불고기 + 잡곡밥 + 된장국', cal: 560 },
-    dinner:    { name: '두부구이 + 채소볶음 + 현미밥', cal: 450 },
-    snack:     { name: '사과 1개 + 견과류 믹스', cal: 190 },
-  }},
-  { day:'수', date: 18, meals: {
-    breakfast: { name: '단백질 셰이크 + 오트밀', cal: 430 },
-    lunch:     { name: '삼치구이 + 나물 3종 + 현미밥', cal: 520 },
-    dinner:    { name: '닭가슴살 스테이크 + 아스파라거스', cal: 470 },
-    snack:     { name: '그릭요거트 + 블루베리', cal: 160 },
-  }},
-  { day:'목', date: 19, meals: {
-    breakfast: { name: '현미죽 + 삶은달걀 2개', cal: 380 },
-    lunch:     { name: '참치 + 야채 쌈밥 + 미역국', cal: 530 },
-    dinner:    { name: '새우 + 채소볶음 + 고구마', cal: 460 },
-    snack:     { name: '단백질바 + 오렌지 1개', cal: 200 },
-  }},
-  { day:'금', date: 20, meals: {
-    breakfast: { name: '귀리 + 단백질 파우더 + 과일', cal: 440 },
-    lunch:     { name: '돼지고기 등심 + 쌈채소 + 된장국', cal: 550 },
-    dinner:    { name: '닭가슴살 샐러드 + 아보카도', cal: 440 },
-    snack:     { name: '견과류 + 저지방 우유', cal: 170 },
-  }},
-  { day:'토', date: 21, meals: {
-    breakfast: { name: '달걀 오믈렛 + 통밀토스트', cal: 460 },
-    lunch:     { name: '장어구이 + 현미밥 + 시금치무침', cal: 580 },
-    dinner:    { name: '두부선 + 나물 + 현미밥', cal: 440 },
-    snack:     { name: '단백질 셰이크', cal: 180 },
-  }},
-  { day:'일', date: 22, meals: {
-    breakfast: { name: '아보카도 토스트 + 스크램블에그', cal: 480 },
-    lunch:     { name: '소고기 뭇국 + 잡곡밥 + 나물', cal: 560 },
-    dinner:    { name: '연어포케 + 퀴노아', cal: 490 },
-    snack:     { name: '바나나 + 아몬드 버터', cal: 210 },
-  }},
+// 주차별 데이터 (0: 3/9~3/15, 1: 3/16~3/22, 2: 3/23~3/29)
+const ALL_WEEKS_MEALS = [
+  // 3월 2주차
+  [
+    { day:'월', date: 9, meals: { breakfast: { name: '오트밀 + 사과', cal: 350 }, lunch: { name: '닭가슴살 볶음밥', cal: 500 }, dinner: { name: '돼지고기 수육 + 채소', cal: 450 }, snack: { name: '단백질 셰이크', cal: 150 }}},
+    { day:'화', date: 10, meals: { breakfast: { name: '그릭요거트 + 블루베리', cal: 300 }, lunch: { name: '소고기 덮밥', cal: 550 }, dinner: { name: '연어 구이 + 샐러드', cal: 450 }, snack: { name: '견과류 줌', cal: 200 }}},
+    { day:'수', date: 11, meals: { breakfast: { name: '통밀 토스트 + 계란프라이', cal: 400 }, lunch: { name: '참치 비빔밥', cal: 500 }, dinner: { name: '닭가슴살 소시지 + 야채', cal: 400 }, snack: { name: '방울토마토', cal: 100 }}},
+    { day:'목', date: 12, meals: { breakfast: { name: '바나나 + 단백질 셰이크', cal: 350 }, lunch: { name: '돼지고기 등심 샐러드', cal: 480 }, dinner: { name: '두부 버섯 전골', cal: 420 }, snack: { name: '삶은 계란 2개', cal: 160 }}},
+    { day:'금', date: 13, meals: { breakfast: { name: '아보카도 샌드위치', cal: 450 }, lunch: { name: '해산물 토마토 파스타', cal: 550 }, dinner: { name: '닭가슴살 야채 볶음', cal: 450 }, snack: { name: '오렌지', cal: 100 }}},
+    { day:'토', date: 14, meals: { breakfast: { name: '팬케이크 (프로틴)', cal: 480 }, lunch: { name: '소고기 스테이크', cal: 600 }, dinner: { name: '리코타 치즈 샐러드', cal: 380 }, snack: { name: '다크 초콜릿 2조각', cal: 120 }}},
+    { day:'일', date: 15, meals: { breakfast: { name: '계란 볶음밥', cal: 420 }, lunch: { name: '치킨 브레스트랩', cal: 500 }, dinner: { name: '연어 포케', cal: 480 }, snack: { name: '그릭요거트', cal: 180 }}},
+  ],
+  // 3월 3주차 (현재)
+  [
+    { day:'월', date: 16, meals: { breakfast: { name: '귀리밥 + 달걀 2개 + 그릭요거트', cal: 420 }, lunch: { name: '닭가슴살 샐러드 + 현미밥 + 미역국', cal: 540 }, dinner: { name: '연어구이 + 브로콜리 + 고구마', cal: 480 }, snack: { name: '바나나 1개 + 아몬드 10알', cal: 180 }}},
+    { day:'화', date: 17, meals: { breakfast: { name: '통밀빵 + 아보카도 + 삶은달걀', cal: 410 }, lunch: { name: '소불고기 + 잡곡밥 + 된장국', cal: 560 }, dinner: { name: '두부구이 + 채소볶음 + 현미밥', cal: 450 }, snack: { name: '사과 1개 + 견과류 믹스', cal: 190 }}},
+    { day:'수', date: 18, meals: { breakfast: { name: '단백질 셰이크 + 오트밀', cal: 430 }, lunch: { name: '삼치구이 + 나물 3종 + 현미밥', cal: 520 }, dinner: { name: '닭가슴살 스테이크 + 아스파라거스', cal: 470 }, snack: { name: '그릭요거트 + 블루베리', cal: 160 }}},
+    { day:'목', date: 19, meals: { breakfast: { name: '현미죽 + 삶은달걀 2개', cal: 380 }, lunch: { name: '참치 + 야채 쌈밥 + 미역국', cal: 530 }, dinner: { name: '새우 + 채소볶음 + 고구마', cal: 460 }, snack: { name: '단백질바 + 오렌지 1개', cal: 200 }}},
+    { day:'금', date: 20, meals: { breakfast: { name: '귀리 + 단백질 파우더 + 과일', cal: 440 }, lunch: { name: '돼지고기 등심 + 쌈채소 + 된장국', cal: 550 }, dinner: { name: '닭가슴살 샐러드 + 아보카도', cal: 440 }, snack: { name: '견과류 + 저지방 우유', cal: 170 }}},
+    { day:'토', date: 21, meals: { breakfast: { name: '달걀 오믈렛 + 통밀토스트', cal: 460 }, lunch: { name: '장어구이 + 현미밥 + 시금치무침', cal: 580 }, dinner: { name: '두부선 + 나물 + 현미밥', cal: 440 }, snack: { name: '단백질 셰이크', cal: 180 }}},
+    { day:'일', date: 22, meals: { breakfast: { name: '아보카도 토스트 + 스크램블에그', cal: 480 }, lunch: { name: '소고기 뭇국 + 잡곡밥 + 나물', cal: 560 }, dinner: { name: '연어포케 + 퀴노아', cal: 490 }, snack: { name: '바나나 + 아몬드 버터', cal: 210 }}},
+  ],
+  // 3월 4주차 
+  [
+    { day:'월', date: 23, meals: { breakfast: { name: '닭가슴살 소시지 그라탕', cal: 450 }, lunch: { name: '현미 비빔밥', cal: 500 }, dinner: { name: '고등어 구이 + 나물', cal: 480 }, snack: { name: '토마토 주스', cal: 120 }}},
+    { day:'화', date: 24, meals: { breakfast: { name: '오트밀 포리지', cal: 380 }, lunch: { name: '소고기 샤브샤브', cal: 520 }, dinner: { name: '두부면 파스타', cal: 430 }, snack: { name: '아몬드 로카', cal: 180 }}},
+    { day:'수', date: 25, meals: { breakfast: { name: '블루베리 베이글 + 크림치즈', cal: 460 }, lunch: { name: '치킨 카레라이스', cal: 540 }, dinner: { name: '쭈꾸미 볶음 + 깻잎', cal: 450 }, snack: { name: '삶은 계란 1개', cal: 80 }}},
+    { day:'목', date: 26, meals: { breakfast: { name: '단호박 스프 + 크래커', cal: 350 }, lunch: { name: '돼지 불고기 덮밥', cal: 580 }, dinner: { name: '양배추 롤', cal: 400 }, snack: { name: '단백질바', cal: 200 }}},
+    { day:'금', date: 27, meals: { breakfast: { name: '햄치즈 샌드위치', cal: 480 }, lunch: { name: '연어 초밥 8피스', cal: 500 }, dinner: { name: '닭가슴살 또띠아 랩', cal: 450 }, snack: { name: '바나나', cal: 100 }}},
+    { day:'토', date: 28, meals: { breakfast: { name: '프렌치 토스트', cal: 420 }, lunch: { name: '해물 볶음 우동', cal: 550 }, dinner: { name: '목살 구이 + 쌈무', cal: 500 }, snack: { name: '초코 프로틴 셰이크', cal: 160 }}},
+    { day:'일', date: 29, meals: { breakfast: { name: '전복죽', cal: 360 }, lunch: { name: '비빔 냉면 + 만두 2개', cal: 580 }, dinner: { name: '소고기 미역국 + 조기구이', cal: 460 }, snack: { name: '제철 과일 믹스', cal: 150 }}},
+  ]
 ];
 
-const EXERCISE_LOG = [
-  { id:1, type:'running', name:'하프마라톤 대회', date:'2026-03-12', duration:116, distance:21.1, calories:1150, note:'전체 289위 / 1:56:43' },
-  { id:2, type:'weight', name:'상체 웨이트', date:'2026-03-10', duration:60, distance:null, calories:320, note:'벤치프레스 / 숄더프레스' },
-  { id:3, type:'running', name:'조깅', date:'2026-03-08', duration:45, distance:7.5, calories:480, note:'페이스 6:00/km' },
-  { id:4, type:'weight', name:'하체 웨이트', date:'2026-03-06', duration:70, distance:null, calories:380, note:'스쿼트 / 레그프레스' },
+// 초기 기본 제공 운동 기록 (처음 한 번만 세팅)
+const DEFAULT_EXERCISE_LOG = [
+  { id:1, date:'2026-03-16', type:'운동', title:'가슴/삼두 루틴', duration:60, cal:450 },
+  { id:2, date:'2026-03-12', type:'러닝', title:'야간 한강 러닝', duration:45, cal:320, distance:5.2 },
+  { id:3, date:'2026-03-10', type:'등산', title:'관악산 등반 (초보 코스)', duration:180, cal:1200 },
 ];
+
+// 로컬 스토리지에서 운동 기록 불러오기 (없으면 기본값 세팅 후 저장)
+let EXERCISE_LOG = [];
+const savedLogs = localStorage.getItem('fitpro_exercises');
+if (savedLogs) {
+  EXERCISE_LOG = JSON.parse(savedLogs);
+} else {
+  EXERCISE_LOG = [...DEFAULT_EXERCISE_LOG];
+  localStorage.setItem('fitpro_exercises', JSON.stringify(EXERCISE_LOG));
+}
 
 // ── State ─────────────────────────────────────────────────────────
-let exerciseLogs = [...EXERCISE_LOG];
-let nextId = 5;
+let nextId = 5; // This is now unused as addExercise uses Date.now() for id
 const TODAY = { day: '화', date: 17 }; // 오늘: 3월 17일(화) 기준 표시
 
 // ── Utils ─────────────────────────────────────────────────────────
@@ -178,11 +175,14 @@ function renderBodyCompBars() {
 }
 
 // ── Meal Plan ─────────────────────────────────────────────────────
-function renderMealPlan() {
+function renderMealPlan(weekIndex = 1) {
   const grid = $('meal-grid');
   if(!grid) return;
   const todayDate = 17; // 오늘 3/17
-  grid.innerHTML = WEEK_MEALS.map(d => {
+  
+  const weekMeals = ALL_WEEKS_MEALS[weekIndex];
+  
+  grid.innerHTML = weekMeals.map(d => {
     const isToday = d.date === todayDate;
     const total = Object.values(d.meals).reduce((s,m) => s + m.cal, 0);
     const slotKeys = { breakfast:'🌅 아침', lunch:'☀️ 점심', dinner:'🌙 저녁', snack:'🍎 간식' };
@@ -213,48 +213,65 @@ function renderMealPlan() {
   }).join('');
 }
 
-// ── Exercise ──────────────────────────────────────────────────────
+// ── Exercise Log ──────────────────────────────────────────────────
+function saveExerciseLog() {
+  localStorage.setItem('fitpro_exercises', JSON.stringify(EXERCISE_LOG));
+}
+
 function renderExerciseLog() {
   const list = $('exercise-list');
   if(!list) return;
-  const typeLabels = { running:'러닝', weight:'웨이트', cycling:'사이클', swimming:'수영', other:'기타' };
-  list.innerHTML = exerciseLogs.sort((a,b)=>b.id-a.id).map(ex => `
+  const typeLabels = { '러닝':'러닝', '운동':'운동', '사이클':'사이클', '수영':'수영', '등산':'등산', '기타':'기타' };
+  list.innerHTML = EXERCISE_LOG.sort((a,b)=>new Date(b.date).getTime()-new Date(a.date).getTime()).map(ex => `
     <div class="exercise-item" id="ex-${ex.id}">
       <span class="exercise-type-badge badge-${ex.type}">${typeLabels[ex.type]||ex.type}</span>
       <div class="exercise-detail">
-        <div class="exercise-name">${ex.name}</div>
+        <div class="exercise-name">${ex.title}</div>
         <div class="exercise-meta">
           📅 ${ex.date} &nbsp;⏱️ ${ex.duration}분
           ${ex.distance ? `&nbsp;📍 ${ex.distance}km` : ''}
-          ${ex.note ? `&nbsp;·&nbsp;<span style="color:var(--accent-primary)">${ex.note}</span>` : ''}
         </div>
       </div>
-      <div class="exercise-calories">${ex.calories} kcal</div>
+      <div class="exercise-calories">${ex.cal} kcal</div>
       <button class="btn btn-danger" onclick="deleteExercise(${ex.id})" style="padding:6px 12px;font-size:12px">삭제</button>
     </div>`).join('');
 }
 
 function addExercise() {
-  const type = $('ex-type').value;
-  const name = $('ex-name').value.trim();
-  const duration = parseInt($('ex-duration').value);
-  const calories = parseInt($('ex-calories').value);
-  const distance = parseFloat($('ex-distance').value) || null;
-  const date = $('ex-date').value;
-  const note = $('ex-note').value.trim();
-  if(!name || !duration || !calories || !date) {
-    alert('종목명, 시간, 칼로리, 날짜를 입력해주세요.');
+  const inputs = [$('ex-type'), $('ex-name'), $('ex-duration'), $('ex-calories')];
+  const todayDateStr = $('ex-date').value;
+
+  const newEx = {
+    id: Date.now(),
+    date: todayDateStr,
+    type: inputs[0].value.trim(),
+    title: inputs[1].value.trim(),
+    duration: parseInt(inputs[2].value) || 0,
+    cal: parseInt(inputs[3].value) || 0
+  };
+  
+  if(!newEx.type || !newEx.title || !newEx.duration || !newEx.cal) {
+    alert('모든 필드를 입력해주세요.');
     return;
   }
-  exerciseLogs.push({ id: nextId++, type, name, date, duration, distance, calories, note });
+  
+  EXERCISE_LOG.unshift(newEx); // 최신 항목을 맨 앞에 추가
+  saveExerciseLog();           // 로컬 스토리지에 저장
   renderExerciseLog();
-  $('ex-name').value = ''; $('ex-duration').value = ''; $('ex-calories').value = '';
-  $('ex-distance').value = ''; $('ex-note').value = '';
+  
+  // 입력 폼 초기화
+  inputs.forEach(i => i.value='');
 }
 
 function deleteExercise(id) {
-  exerciseLogs = exerciseLogs.filter(e => e.id !== id);
-  renderExerciseLog();
+  if(confirm('이 기록을 삭제하시겠습니까?')) {
+    const idx = EXERCISE_LOG.findIndex(e => e.id === id);
+    if(idx !== -1) {
+      EXERCISE_LOG.splice(idx, 1);
+      saveExerciseLog();     // 로컬 스토리지 업데이트
+      renderExerciseLog();
+    }
+  }
 }
 
 // ── Goals ─────────────────────────────────────────────────────────
@@ -282,6 +299,140 @@ function renderGoals() {
 // ── Running Records ───────────────────────────────────────────────
 function renderRunning() {
   // records already in HTML
+}
+
+// ── Running OCR ───────────────────────────────────────────────────
+function initOCR() {
+  const uploadInput = $('ocr-upload');
+  if (!uploadInput) return;
+
+  const ocrStatus = $('ocr-status');
+  const ocrMsg = $('ocr-msg');
+  const ocrResult = $('ocr-result');
+  
+  const resType = $('ocr-res-type');
+  const resDate = $('ocr-res-date');
+  const resDist = $('ocr-res-distance');
+  const resDur = $('ocr-res-duration');
+  const btnSave = $('btn-ocr-save');
+
+  // 파싱된 임시 저장 데이터
+  let parsedData = null;
+
+  uploadInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // UI 상태 초기화
+    ocrStatus.style.display = 'block';
+    ocrResult.style.display = 'none';
+    ocrMsg.textContent = '이미지 분석 중... 잠시만 기다려주세요 (0%)';
+    parsedData = null;
+
+    try {
+      const { data: { text } } = await Tesseract.recognize(
+        file,
+        'kor+eng',
+        {
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              ocrMsg.textContent = `이미지 분석 중... 잠시만 기다려주세요 (${Math.round(m.progress * 100)}%)`;
+            }
+          }
+        }
+      );
+
+      console.log('--- OCR 추출 결과 ---');
+      console.log(text);
+      console.log('---------------------');
+
+      // 텍스트 파싱 로직 (정규식)
+      // 1. 거리 (예: 5.23 km, 10.0km)
+      let distance = 0;
+      const distMatch = text.match(/([\d\.]+)\s*(?:km|KM)/i) || text.match(/(?:거리|Distance)[\s:]*([\d\.]+)/i);
+      if (distMatch && distMatch[1]) {
+        distance = parseFloat(distMatch[1]);
+      }
+
+      // 2. 시간 (예: 45:12, 1:05:30)
+      let durationStr = "00:00";
+      let durationMin = 0;
+      const timeMatch = text.match(/(\d{1,2}:\d{2}(?::\d{2})?)/);
+      if (timeMatch && timeMatch[1]) {
+        durationStr = timeMatch[1];
+        const parts = durationStr.split(':');
+        if (parts.length === 3) {
+          durationMin = parseInt(parts[0])*60 + parseInt(parts[1]);
+        } else if (parts.length === 2) {
+          durationMin = parseInt(parts[0]);
+        }
+      }
+
+      // 3. 날짜 (예: 2026.03.17, 3월 17일, 어제)
+      // 실제로는 OCR 파싱이 완벽하지 않으므로, 못 찾으면 오늘 날짜로 폴백
+      let dateStr = new Date('2026-03-17').toISOString().split('T')[0];
+      const dateMatch = text.match(/(20\d{2})[\.\-\/년\s]?(\d{1,2})[\.\-\/월\s]?(\d{1,2})/);
+      if (dateMatch) {
+         const y = dateMatch[1];
+         const m = dateMatch[2].padStart(2, '0');
+         const d = dateMatch[3].padStart(2, '0');
+         dateStr = `${y}-${m}-${d}`;
+      }
+
+      // 칼로리 임의 추정 (러닝거리 * 65kcal)
+      let cal = distance ? Math.round(distance * 65) : 350;
+
+      parsedData = {
+        id: Date.now(),
+        date: dateStr,
+        type: '러닝',
+        title: '러닝 기록 (OCR 자동입력)',
+        distance: distance,
+        duration: durationMin || 45, // 기본값 45
+        cal: cal
+      };
+
+      // 실패 처리
+      if (!distance && !durationMin) {
+        ocrStatus.style.display = 'none';
+        alert('러닝 기록을 명확히 인식하지 못했습니다. 선명한 스크린샷을 사용하거나 직접 입력해주세요.');
+        return;
+      }
+
+      // 성공 시 UI 업데이트
+      ocrStatus.style.display = 'none';
+      ocrResult.style.display = 'block';
+      
+      resType.textContent = parsedData.type;
+      resDate.textContent = parsedData.date;
+      resDist.textContent = parsedData.distance ? `${parsedData.distance} km` : '알 수 없음';
+      resDur.textContent = durationStr + ` (${parsedData.duration}분)`;
+      
+    } catch (err) {
+      console.error(err);
+      ocrStatus.style.display = 'none';
+      alert('이미지 인식 중 오류가 발생했습니다.');
+    }
+    
+    // input 초기화
+    uploadInput.value = '';
+  });
+
+  // 즉시 저장 버튼 클릭
+  btnSave.addEventListener('click', () => {
+    if (!parsedData) return;
+    EXERCISE_LOG.unshift(parsedData);
+    saveExerciseLog();
+    renderExerciseLog();
+    
+    // UI 원복 및 토스트나 알림
+    ocrResult.style.display = 'none';
+    alert('운동 기록에 성공적으로 저장되었습니다!');
+    
+    // 운동 탭으로 자동 이동
+    const exerciseTabBtn = document.querySelector('.nav-btn[data-target="page-exercise"]');
+    if (exerciseTabBtn) exerciseTabBtn.click();
+  });
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────
@@ -335,14 +486,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // 기본 페이지: dashboard
   switchPage('dashboard');
   renderDashboard();
-  renderMealPlan();
+  renderMealPlan(1); // 기본은 3월 3주차 (인덱스 1)
   renderExerciseLog();
   renderGoals();
   renderRunning();
 
+  // 식단 계획 주차 변경 이벤트
+  const weekSelector = $('week-selector');
+  if(weekSelector) {
+    weekSelector.addEventListener('change', (e) => {
+      const idx = parseInt(e.target.value);
+      renderMealPlan(idx);
+      
+      // 제목 업데이트
+      const descEl = $('meal-plan-desc');
+      if (descEl) {
+        const textMaps = ["2026년 3월 2주차", "2026년 3월 3주차", "2026년 3월 4주차"];
+        descEl.textContent = `${textMaps[idx]} · 체지방 감량 맞춤 식단 (1,900 kcal/일)`;
+      }
+    });
+  }
+
   // 운동 추가 버튼
   const addBtn = $('btn-add-exercise');
   if(addBtn) addBtn.addEventListener('click', addExercise);
+
+  // 러닝 OCR 초기화
+  initOCR();
 
   // 구글 캘린더 초기화
   initGoogleCalendar();
