@@ -11,33 +11,33 @@ const USER = {
 const ALL_WEEKS_MEALS = [
   // 3월 2주차
   [
-    { day:'월', date: 9, meals: { breakfast: { name: '오트밀 + 사과', cal: 350 }, lunch: { name: '닭가슴살 볶음밥', cal: 500 }, dinner: { name: '돼지고기 수육 + 채소', cal: 450 }, snack: { name: '단백질 셰이크', cal: 150 }}},
-    { day:'화', date: 10, meals: { breakfast: { name: '그릭요거트 + 블루베리', cal: 300 }, lunch: { name: '소고기 덮밥', cal: 550 }, dinner: { name: '연어 구이 + 샐러드', cal: 450 }, snack: { name: '견과류 줌', cal: 200 }}},
-    { day:'수', date: 11, meals: { breakfast: { name: '통밀 토스트 + 계란프라이', cal: 400 }, lunch: { name: '참치 비빔밥', cal: 500 }, dinner: { name: '닭가슴살 소시지 + 야채', cal: 400 }, snack: { name: '방울토마토', cal: 100 }}},
-    { day:'목', date: 12, meals: { breakfast: { name: '바나나 + 단백질 셰이크', cal: 350 }, lunch: { name: '돼지고기 등심 샐러드', cal: 480 }, dinner: { name: '두부 버섯 전골', cal: 420 }, snack: { name: '삶은 계란 2개', cal: 160 }}},
-    { day:'금', date: 13, meals: { breakfast: { name: '아보카도 샌드위치', cal: 450 }, lunch: { name: '해산물 토마토 파스타', cal: 550 }, dinner: { name: '닭가슴살 야채 볶음', cal: 450 }, snack: { name: '오렌지', cal: 100 }}},
-    { day:'토', date: 14, meals: { breakfast: { name: '팬케이크 (프로틴)', cal: 480 }, lunch: { name: '소고기 스테이크', cal: 600 }, dinner: { name: '리코타 치즈 샐러드', cal: 380 }, snack: { name: '다크 초콜릿 2조각', cal: 120 }}},
-    { day:'일', date: 15, meals: { breakfast: { name: '계란 볶음밥', cal: 420 }, lunch: { name: '치킨 브레스트랩', cal: 500 }, dinner: { name: '연어 포케', cal: 480 }, snack: { name: '그릭요거트', cal: 180 }}},
+    { day:'월', date: 9, meals: { breakfast: { name: '현미밥 1/2+계란말이', cal: 350 }, lunch: { name: '참치야채비빔밥', cal: 500 }, dinner: { name: '닭가슴살 토마토스튜', cal: 400 }, snack: { name: '방울토마토 10알', cal: 100 }}},
+    { day:'화', date: 10, meals: { breakfast: { name: '오트밀 우유+아몬드', cal: 300 }, lunch: { name: '두부구이 백반', cal: 550 }, dinner: { name: '연어샐러드+발사믹', cal: 420 }, snack: { name: '그릭요거트', cal: 150 }}},
+    { day:'수', date: 11, meals: { breakfast: { name: '통밀식빵+계란프라이', cal: 380 }, lunch: { name: '소불고기덮밥(소량)', cal: 520 }, dinner: { name: '단호박+닭가슴살', cal: 450 }, snack: { name: '두유 1팩', cal: 120 }}},
+    { day:'목', date: 12, meals: { breakfast: { name: '사과 반쪽+삶은계란 2', cal: 280 }, lunch: { name: '새우볶음밥+미역국', cal: 560 }, dinner: { name: '소고기 샤브샤브', cal: 480 }, snack: { name: '다크초콜릿 약간', cal: 100 }}},
+    { day:'금', date: 13, meals: { breakfast: { name: '단백질 쉐이크', cal: 250 }, lunch: { name: '알리오올리오 약간', cal: 550 }, dinner: { name: '닭가슴살 랩', cal: 410 }, snack: { name: '블루베리 한 줌', cal: 80 }}},
+    { day:'토', date: 14, meals: { breakfast: { name: '오믈렛+통밀크래커', cal: 420 }, lunch: { name: '연어롤+우동 소량', cal: 600 }, dinner: { name: '소고기 안심 스테이크', cal: 520 }, snack: { name: '아메리카노', cal: 10 }}},
+    { day:'일', date: 15, meals: { breakfast: { name: '고구마 1+우유', cal: 320 }, lunch: { name: '치킨 브레스트 샌드위치', cal: 480 }, dinner: { name: '그린샐러드+리코타', cal: 350 }, snack: { name: '단백질 바', cal: 180 }}},
   ],
   // 3월 3주차 (현재)
   [
-    { day:'월', date: 16, meals: { breakfast: { name: '귀리밥 + 달걀 2개 + 그릭요거트', cal: 420 }, lunch: { name: '닭가슴살 샐러드 + 현미밥 + 미역국', cal: 540 }, dinner: { name: '연어구이 + 브로콜리 + 고구마', cal: 480 }, snack: { name: '바나나 1개 + 아몬드 10알', cal: 180 }}},
-    { day:'화', date: 17, meals: { breakfast: { name: '통밀빵 + 아보카도 + 삶은달걀', cal: 410 }, lunch: { name: '소불고기 + 잡곡밥 + 된장국', cal: 560 }, dinner: { name: '두부구이 + 채소볶음 + 현미밥', cal: 450 }, snack: { name: '사과 1개 + 견과류 믹스', cal: 190 }}},
-    { day:'수', date: 18, meals: { breakfast: { name: '단백질 셰이크 + 오트밀', cal: 430 }, lunch: { name: '삼치구이 + 나물 3종 + 현미밥', cal: 520 }, dinner: { name: '닭가슴살 스테이크 + 아스파라거스', cal: 470 }, snack: { name: '그릭요거트 + 블루베리', cal: 160 }}},
-    { day:'목', date: 19, meals: { breakfast: { name: '현미죽 + 삶은달걀 2개', cal: 380 }, lunch: { name: '참치 + 야채 쌈밥 + 미역국', cal: 530 }, dinner: { name: '새우 + 채소볶음 + 고구마', cal: 460 }, snack: { name: '단백질바 + 오렌지 1개', cal: 200 }}},
-    { day:'금', date: 20, meals: { breakfast: { name: '귀리 + 단백질 파우더 + 과일', cal: 440 }, lunch: { name: '돼지고기 등심 + 쌈채소 + 된장국', cal: 550 }, dinner: { name: '닭가슴살 샐러드 + 아보카도', cal: 440 }, snack: { name: '견과류 + 저지방 우유', cal: 170 }}},
-    { day:'토', date: 21, meals: { breakfast: { name: '달걀 오믈렛 + 통밀토스트', cal: 460 }, lunch: { name: '장어구이 + 현미밥 + 시금치무침', cal: 580 }, dinner: { name: '두부선 + 나물 + 현미밥', cal: 440 }, snack: { name: '단백질 셰이크', cal: 180 }}},
-    { day:'일', date: 22, meals: { breakfast: { name: '아보카도 토스트 + 스크램블에그', cal: 480 }, lunch: { name: '소고기 뭇국 + 잡곡밥 + 나물', cal: 560 }, dinner: { name: '연어포케 + 퀴노아', cal: 490 }, snack: { name: '바나나 + 아몬드 버터', cal: 210 }}},
+    { day:'월', date: 16, meals: { breakfast: { name: '호밀빵 1쪽+무가당 피넛버터+삶은 달걀', cal: 380 }, lunch: { name: '현미밥+닭가슴살 미역국+나물무침', cal: 520 }, dinner: { name: '구운 틸라피아+아스파라거스 구이', cal: 400 }, snack: { name: '무염 견과류 1줌', cal: 150 }}},
+    { day:'화', date: 17, meals: { breakfast: { name: '그릭요거트+오트밀+냉동블루베리', cal: 350 }, lunch: { name: '잡곡밥+돼지고기 뒷다리살 불고기+쌈야채', cal: 580 }, dinner: { name: '두부 버섯 샐러드+오리엔탈 드레싱', cal: 380 }, snack: { name: '방울토마토 15개', cal: 50 }}},
+    { day:'수', date: 18, meals: { breakfast: { name: '바나나 1개+단백질 보충제(무지방우유)', cal: 320 }, lunch: { name: '연어 포케 보울(현미밥 베이스)', cal: 550 }, dinner: { name: '닭가슴살 소시지+단호박 구이', cal: 410 }, snack: { name: '구운 계란 2개', cal: 140 }}},
+    { day:'목', date: 19, meals: { breakfast: { name: '통밀 랩+스크램블 에그+스리라차 소스', cal: 390 }, lunch: { name: '소고기 무국(건더기 위주)+현미밥+김치', cal: 500 }, dinner: { name: '오징어 숙회+브로콜리 샐러드', cal: 370 }, snack: { name: '저지방 스트링치즈 1개', cal: 60 }}},
+    { day:'금', date: 20, meals: { breakfast: { name: '고구마 1개+저지방 우유 한 컵', cal: 330 }, lunch: { name: '참치 비빔밥(현미밥, 고추장 소량)', cal: 540 }, dinner: { name: '돼지고기 목살구이(기름제거)+구운 채소', cal: 480 }, snack: { name: '아메리카노 1잔+아몬드 10알', cal: 70 }}},
+    { day:'토', date: 21, meals: { breakfast: { name: '단호박 에그슬럿+방울토마토', cal: 340 }, lunch: { name: '메밀소바+새우튀김 1마리(특식)', cal: 600 }, dinner: { name: '닭가슴살 채소 월남쌈', cal: 420 }, snack: { name: '키위 1개', cal: 60 }}},
+    { day:'일', date: 22, meals: { breakfast: { name: '플레인 스콘 1/2+홍차+삶은 달걀', cal: 370 }, lunch: { name: '소고기 샤브샤브(고기와 채소 듬뿍)', cal: 580 }, dinner: { name: '리코타 치즈 샐러드+발사믹 식초', cal: 390 }, snack: { name: '프로틴 바 1개', cal: 180 }}},
   ],
   // 3월 4주차 
   [
-    { day:'월', date: 23, meals: { breakfast: { name: '닭가슴살 소시지 그라탕', cal: 450 }, lunch: { name: '현미 비빔밥', cal: 500 }, dinner: { name: '고등어 구이 + 나물', cal: 480 }, snack: { name: '토마토 주스', cal: 120 }}},
-    { day:'화', date: 24, meals: { breakfast: { name: '오트밀 포리지', cal: 380 }, lunch: { name: '소고기 샤브샤브', cal: 520 }, dinner: { name: '두부면 파스타', cal: 430 }, snack: { name: '아몬드 로카', cal: 180 }}},
-    { day:'수', date: 25, meals: { breakfast: { name: '블루베리 베이글 + 크림치즈', cal: 460 }, lunch: { name: '치킨 카레라이스', cal: 540 }, dinner: { name: '쭈꾸미 볶음 + 깻잎', cal: 450 }, snack: { name: '삶은 계란 1개', cal: 80 }}},
-    { day:'목', date: 26, meals: { breakfast: { name: '단호박 스프 + 크래커', cal: 350 }, lunch: { name: '돼지 불고기 덮밥', cal: 580 }, dinner: { name: '양배추 롤', cal: 400 }, snack: { name: '단백질바', cal: 200 }}},
-    { day:'금', date: 27, meals: { breakfast: { name: '햄치즈 샌드위치', cal: 480 }, lunch: { name: '연어 초밥 8피스', cal: 500 }, dinner: { name: '닭가슴살 또띠아 랩', cal: 450 }, snack: { name: '바나나', cal: 100 }}},
-    { day:'토', date: 28, meals: { breakfast: { name: '프렌치 토스트', cal: 420 }, lunch: { name: '해물 볶음 우동', cal: 550 }, dinner: { name: '목살 구이 + 쌈무', cal: 500 }, snack: { name: '초코 프로틴 셰이크', cal: 160 }}},
-    { day:'일', date: 29, meals: { breakfast: { name: '전복죽', cal: 360 }, lunch: { name: '비빔 냉면 + 만두 2개', cal: 580 }, dinner: { name: '소고기 미역국 + 조기구이', cal: 460 }, snack: { name: '제철 과일 믹스', cal: 150 }}},
+    { day:'월', date: 23, meals: { breakfast: { name: '오트밀죽(닭가슴살 베이스)', cal: 360 }, lunch: { name: '현미밥+된장찌개+고등어 반 토막', cal: 530 }, dinner: { name: '스테이크 샐러드(우둔살 150g)', cal: 450 }, snack: { name: '자몽 1/2개', cal: 50 }}},
+    { day:'화', date: 24, meals: { breakfast: { name: '사과 1/2+단백질 쉐이크', cal: 280 }, lunch: { name: '닭가슴살 샌드위치(통밀빵)+블랙커피', cal: 500 }, dinner: { name: '두부면 파스타+새우 5마리', cal: 420 }, snack: { name: '브라질너트 2알', cal: 40 }}},
+    { day:'수', date: 25, meals: { breakfast: { name: '계란 프라이 2+양배추 샐러드', cal: 320 }, lunch: { name: '나물 비빔밥+달걀프라이', cal: 510 }, dinner: { name: '연어 스테이크 150g+아스파라거스', cal: 460 }, snack: { name: '플레인 요거트', cal: 100 }}},
+    { day:'목', date: 26, meals: { breakfast: { name: '바나나 팬케이크(프로틴 파우더 함유)', cal: 390 }, lunch: { name: '닭가슴살 카레+현미밥 소량', cal: 550 }, dinner: { name: '토마토 카프레제 샐러드+삶은 계란', cal: 380 }, snack: { name: '오이 1개+스리라차', cal: 20 }}},
+    { day:'금', date: 27, meals: { breakfast: { name: '호밀빵 1조각+리코타 치즈+토마토', cal: 350 }, lunch: { name: '돼지고기 수육(살코기)+보쌈김치 약간', cal: 580 }, dinner: { name: '야채 오믈렛(달걀 3개 분량)', cal: 400 }, snack: { name: '아이스 아메리카노', cal: 10 }}},
+    { day:'토', date: 28, meals: { breakfast: { name: '단백질 쉐이크+블루베리', cal: 250 }, lunch: { name: '회덮밥(초장 소량 조절)', cal: 560 }, dinner: { name: '닭가슴살 냉채+겨자 소스', cal: 350 }, snack: { name: '방울토마토 20알', cal: 60 }}},
+    { day:'일', date: 29, meals: { breakfast: { name: '통밀 시리얼+무지방 우유', cal: 320 }, lunch: { name: '토마토 해물 파스타(면 70g)', cal: 540 }, dinner: { name: '두부구이+신김치 약간', cal: 390 }, snack: { name: '삶은 계란 1개', cal: 70 }}},
   ]
 ];
 
@@ -159,14 +159,16 @@ function renderNutritionCircles() {
     container.querySelector('.circle-fill').style.strokeDasharray = circumference;
     container.querySelector('.circle-fill').style.stroke = t.color;
     container.querySelector('.circle-center').textContent = t.pct + '%';
-    container.querySelector('.nutrition-gram').textContent = t.gram;
+    if (container.parentElement && container.parentElement.querySelector('.nutrition-gram')) {
+      container.parentElement.querySelector('.nutrition-gram').textContent = t.gram;
+    }
   });
 }
 
 function renderBodyCompBars() {
   const items = [
-    { bar: 'bar-inbody-fat', pct: (USER.fatPct / 30) * 100, label: `체지방률 ${USER.fatPct}%`, color:'red', range:'표준: 10~20%' },
-    { bar: 'bar-inbody-muscle', pct: (USER.muscle / 45) * 100, label: `골격근량 ${USER.muscle}kg`, color:'purple', range:'표준: 32.4~39.6kg' },
+    { bar: 'bar-fat', pct: (USER.fatPct / 30) * 100, label: `체지방률 ${USER.fatPct}%`, color:'red', range:'표준: 10~20%' },
+    { bar: 'bar-muscle', pct: (USER.muscle / 45) * 100, label: `골격근량 ${USER.muscle}kg`, color:'purple', range:'표준: 32.4~39.6kg' },
   ];
   items.forEach(i => {
     const el = $(i.bar);
@@ -205,9 +207,6 @@ function renderMealPlan(weekIndex = 1) {
         <div class="meal-total">
           <span class="meal-total-label">총 칼로리</span>
           <span class="meal-total-cal">${total} kcal</span>
-        </div>
-        <div style="padding:0 10px 10px">
-          <div class="progress-bar"><div class="progress-fill ${total > USER.targetCal*1.1 ? 'red' : 'green'}" style="width:${calPct}%"></div></div>
         </div>
       </div>`;
   }).join('');
