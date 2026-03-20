@@ -59,8 +59,12 @@ if (setApi) {
   window.history.replaceState({}, document.title, window.location.pathname);
 }
 
-// [개선] 현재 접속한 서버의 /api 경로를 기본으로 사용함 (프록시 활용)
-const API_BASE = localStorage.getItem('fitpro_api_url') || `${window.location.origin}/api`;
+// [개선] 로컬 접속 시 백엔드 포트(5000) 자동 감지 및 프록시 대응
+let defaultApi = `${window.location.origin}/api`;
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  defaultApi = 'http://localhost:5000/api';
+}
+const API_BASE = localStorage.getItem('fitpro_api_url') || defaultApi;
 console.log('📡 연결된 API 서버 주소:', API_BASE);
 let AUTH_TOKEN = localStorage.getItem('fitpro_token');
 let AUTH_USER = localStorage.getItem('fitpro_user') || 'Guest';
