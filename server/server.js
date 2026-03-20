@@ -25,11 +25,21 @@ app.use(express.json());
 // 미들웨어: JWT 토큰 검증
 const verifyToken = (req, res, next) => {
   const token = req.headers['authorization'];
-  if (!token) return res.status(403).json({ error: '토큰이 제공되지 않았습니다.' });
+  if (!token) {
+    // [우회 모드] 토큰이 없으면 기본 사용자(ID: 1)로 인식
+    console.log('[Auth Bypass] No token provided. Defaulting to userId 1.');
+    req.userId = 1;
+    return next();
+  }
   
   const tokenValue = token.split(' ')[1]; // "Bearer TOKEN_STRING"
   jwt.verify(tokenValue, JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ error: '유효하지 않은 토큰입니다.' });
+    if (err) {
+      // [우회 모드] 유효하지 않은 토큰이어도 기본 사용자(ID: 1)로 인식
+      console.log('[Auth Bypass] Invalid token. Defaulting to userId 1.');
+      req.userId = 1;
+      return next();
+    }
     req.userId = decoded.id;
     next();
   });
