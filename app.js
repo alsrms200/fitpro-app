@@ -110,6 +110,7 @@ function handleLogout() {
   AUTH_USER = null;
   localStorage.removeItem('fitpro_token');
   localStorage.removeItem('fitpro_user');
+  localStorage.removeItem('fitpro_bypass');
   EXERCISE_LOG = [];
   MEAL_LOG = [];
 
@@ -121,16 +122,21 @@ function handleLogout() {
   const mUname = $('mobile-username-display');
   if (mUname) mUname.textContent = 'Guest';
 
-  $('auth-overlay').classList.remove('hidden');
-  if ($('auth-overlay')) $('auth-overlay').remove();
+  // 로그아웃 시 로그인 화면 재생성
+  const existingOverlay = $('auth-overlay');
+  if (existingOverlay) {
+    existingOverlay.style.display = 'flex';
+  } else {
+    location.reload();
+  }
 }
 
 // ── State ─────────────────────────────────────────────────────────
-let nextId = 5; 
+let nextId = 5;
 
 // [미션 1순위] 전역 날짜 동기화 시스템
 // 실제 시스템 시각을 반영 (2026-03-20 기준)
-const APP_NOW = new Date(); 
+const APP_NOW = new Date();
 
 function formatKoreanFullDate(date) {
   const days = ['일', '월', '화', '수', '목', '금', '토'];
@@ -149,15 +155,15 @@ const TODAY = {
 };
 
 function updateTodayLabels() {
-  if($('dashboard-date-text')) $('dashboard-date-text').textContent = TODAY.full;
-  if($('running-highlight-date')) $('running-highlight-date').textContent = `${TODAY.full.split('일')[0]}일 · 21.1km`;
-  if($('actual-calorie-label')) $('actual-calorie-label').textContent = `오늘(${TODAY.day} ${APP_NOW.getMonth()+1}/${TODAY.date})`;
-  if($('gcal-today-title')) $('gcal-today-title').textContent = `📅 ${TODAY.full} 일정`;
-  if($('inbody-date')) $('inbody-date').textContent = TODAY.iso;
-  
+  if ($('dashboard-date-text')) $('dashboard-date-text').textContent = TODAY.full;
+  if ($('running-highlight-date')) $('running-highlight-date').textContent = `${TODAY.full.split('일')[0]}일 · 21.1km`;
+  if ($('actual-calorie-label')) $('actual-calorie-label').textContent = `오늘(${TODAY.day} ${APP_NOW.getMonth() + 1}/${TODAY.date})`;
+  if ($('gcal-today-title')) $('gcal-today-title').textContent = `📅 ${TODAY.full} 일정`;
+  if ($('inbody-date')) $('inbody-date').textContent = TODAY.iso;
+
   // 입력 폼 기본값들
-  if($('ex-date')) $('ex-date').value = TODAY.iso;
-  if($('gcal-event-date')) $('gcal-event-date').value = TODAY.iso;
+  if ($('ex-date')) $('ex-date').value = TODAY.iso;
+  if ($('gcal-event-date')) $('gcal-event-date').value = TODAY.iso;
 }
 
 // ── Utils ─────────────────────────────────────────────────────────
@@ -165,26 +171,6 @@ function $(id) { return document.getElementById(id); }
 function todayDate() {
   return APP_NOW.getDate();
 }
-
-function animateCounter(id, start, end, suffix, duration = 1000, decimals = 0) {
-  const el = $(id);
-  if (!el) return;
-  let startTimestamp = null;
-  const step = (timestamp) => {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-    const value = easeOutQuart * (end - start) + start;
-    el.textContent = (value >= 0 ? '' : '') + value.toFixed(decimals) + suffix;
-    if (progress < 1) {
-      window.requestAnimationFrame(step);
-    } else {
-      el.textContent = end.toFixed(decimals) + suffix;
-    }
-  };
-  window.requestAnimationFrame(step);
-}
-
 
 // ── Navigation ────────────────────────────────────────────────────
 function initNav() {
@@ -793,8 +779,8 @@ function renderActualMeals() {
   const calBar = $('actual-cal-bar');
   if (!listEl || !calText || !calBar) return;
 
-  // 오늘 날짜 데이터 필터링 (2026-03-18)
-  const todayStr = '2026-03-18';
+  // 오늘 날짜 데이터 필터링 (TODAY.iso 기준 동적 처리)
+  const todayStr = TODAY.iso;
   const todaysMeals = MEAL_LOG.filter(m => {
     // DB에서 넘어오는 date format 처리 (T 등 제거)
     return m.date.startsWith(todayStr);
