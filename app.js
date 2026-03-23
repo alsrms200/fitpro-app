@@ -971,7 +971,21 @@ function initAuth() {
         },
         body: JSON.stringify(data)
       });
-      const result = await resp.json();
+      
+      // [개선] 응답이 JSON인지 확인하여 'Unexpected end of JSON input' 오류 방지
+      const contentType = resp.headers.get("content-type");
+      let result = {};
+      
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        result = await resp.json();
+      } else {
+        // JSON이 아닌 경우 (404 페이지 등)
+        const errorMsg = (window.location.hostname !== 'localhost') 
+          ? '🌐 배포 주소에서는 로컬 서버에 직접 접속할 수 없습니다. [게스트 모드]를 이용하시거나 로컬(localhost:3000)에서 접속해 주세요.'
+          : '🔌 서버(5000포트)가 응답하지 않습니다. 백엔드가 실행 중인지 확인해 주세요.';
+        throw new Error(errorMsg);
+      }
+
       if (!resp.ok) throw new Error(result.error || '접속 실패');
 
       // 토큰 저장
